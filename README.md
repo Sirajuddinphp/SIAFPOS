@@ -131,3 +131,4 @@ It is never stored inside the application installation folder.
 Phase 3 adds local cashier shifts, bill settlement, Cash/UPI/Card/split payments, cash change calculation, immutable payment records, and persisted receipt print jobs. Open a shift from **Shift**, then open a running order and choose **Bill**.
 
 Hardware ESC/POS dispatch is intentionally deferred; **Queue Receipt** creates an auditable pending print job for the printer service phase.
+# SIAFPOS
