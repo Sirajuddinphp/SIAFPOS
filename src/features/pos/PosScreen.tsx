@@ -287,14 +287,25 @@ export function PosScreen() {
           <div className="space-y-2">
             {currentOrder?.items.length ? (
               currentOrder.items.map((item) => (
-                <button
+                <div
                   key={item.uuid}
+                  role="button"
+                  tabIndex={0}
                   className={`w-full rounded-md border p-3 text-left ${
-                    selectedItemUuid === item.uuid ? "border-app-primary bg-[#eef7f5]" : "border-app-border bg-app-bg"
+                    selectedItemUuid === item.uuid
+                      ? "border-app-primary bg-[#eef7f5]"
+                      : "border-app-border bg-app-bg"
                   }`}
                   onClick={() => {
                     setSelectedItemUuid(item.uuid);
                     setNoteDraft(item.kitchenNote ?? "");
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setSelectedItemUuid(item.uuid);
+                      setNoteDraft(item.kitchenNote ?? "");
+                    }
                   }}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -303,32 +314,83 @@ export function PosScreen() {
                         {item.productName}
                         {item.variantName ? ` • ${item.variantName}` : ""}
                       </div>
+
                       <div className="mt-1 text-xs text-app-subtle">
-                        {item.modifiers.map((modifier) => modifier.name).join(", ") || "No add-ons"}
+                        {item.modifiers.map((modifier) => modifier.name).join(", ") ||
+                          "No add-ons"}
                       </div>
-                      {item.kitchenNote && <div className="mt-1 text-xs text-app-info">Note: {item.kitchenNote}</div>}
+
+                      {item.kitchenNote && (
+                        <div className="mt-1 text-xs text-app-info">
+                          Note: {item.kitchenNote}
+                        </div>
+                      )}
                     </div>
+
                     <div className="text-right">
-                      <div className="text-sm font-bold">{formatCurrency(item.lineGrandTotalMinor)}</div>
-                      <div className="text-xs text-app-subtle">GST {item.gstMode}</div>
+                      <div className="text-sm font-bold">
+                        {formatCurrency(item.lineGrandTotalMinor)}
+                      </div>
+                      <div className="text-xs text-app-subtle">
+                        GST {item.gstMode}
+                      </div>
                     </div>
                   </div>
+
                   <div className="mt-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Button variant="secondary" className="h-9 px-3" onClick={(event) => { event.stopPropagation(); void updateQuantity(item.uuid, item.qty - 1); }}>-</Button>
-                      <span className="min-w-8 text-center text-sm font-bold">{item.qty}</span>
-                      <Button variant="secondary" className="h-9 px-3" onClick={(event) => { event.stopPropagation(); void updateQuantity(item.uuid, item.qty + 1); }}>+</Button>
+                      <Button
+                        variant="secondary"
+                        className="h-9 px-3"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          void updateQuantity(item.uuid, item.qty - 1);
+                        }}
+                      >
+                        -
+                      </Button>
+
+                      <span className="min-w-8 text-center text-sm font-bold">
+                        {item.qty}
+                      </span>
+
+                      <Button
+                        variant="secondary"
+                        className="h-9 px-3"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          void updateQuantity(item.uuid, item.qty + 1);
+                        }}
+                      >
+                        +
+                      </Button>
                     </div>
+
                     <div className="flex gap-2">
-                      <Button variant="ghost" className="h-9 px-3" onClick={(event) => { event.stopPropagation(); setEditingModifiersFor(item); }}>
+                      <Button
+                        variant="ghost"
+                        className="h-9 px-3"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setEditingModifiersFor(item);
+                        }}
+                      >
                         Configure
                       </Button>
-                      <Button variant="danger" className="h-9 px-3" onClick={(event) => { event.stopPropagation(); void removeItem(item.uuid); }}>
+
+                      <Button
+                        variant="danger"
+                        className="h-9 px-3"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          void removeItem(item.uuid);
+                        }}
+                      >
                         Remove
                       </Button>
                     </div>
                   </div>
-                </button>
+                </div>
               ))
             ) : (
               <div className="rounded-md border border-dashed border-app-border bg-app-bg p-6 text-center text-sm text-app-subtle">
