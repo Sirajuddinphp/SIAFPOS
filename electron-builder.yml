@@ -1,0 +1,32 @@
+appId: com.siafinfoweb.mealhi5pos
+productName: MealHi5 POS
+executableName: MealHi5POS
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist-renderer/**/*
+  - dist-electron/**/*
+  - package.json
+extraResources:
+  - from: electron/database/migrations
+    to: migrations
+    filter:
+      - "**/*.sql"
+win:
+  signAndEditExecutable: false
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: MealHi5 POS
+  deleteAppDataOnUninstall: false
+asar: true
+npmRebuild: false
+publish: null

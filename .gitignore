@@ -1,0 +1,13 @@
+node_modules/
+dist/
+dist-renderer/
+dist-electron/
+release/
+.electron-builder-cache/
+build/
+coverage/
+*.log
+*.sqlite
+*.db
+*.zip
+.DS_Store
