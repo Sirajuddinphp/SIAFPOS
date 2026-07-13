@@ -19,8 +19,8 @@ export function AppLayout() {
   }, [refresh]);
 
   return (
-    <div className="grid h-screen grid-cols-[190px_1fr] bg-app-bg text-app-text">
-      <aside className="border-r border-app-border bg-white">
+    <div className="grid h-screen min-h-0 grid-cols-[190px_1fr] bg-app-bg text-app-text">
+      <aside className="min-h-0 overflow-y-auto border-r border-app-border bg-white">
         <div className="border-b border-app-border px-4 py-4">
           <div className="text-lg font-extrabold">MealHi5 POS</div>
           <div className="text-xs text-app-subtle">Restaurant desktop</div>
@@ -41,7 +41,7 @@ export function AppLayout() {
           ))}
         </nav>
       </aside>
-      <section className="flex min-w-0 flex-col">
+      <section className="flex min-h-0 min-w-0 flex-col">
         <header className="flex h-14 items-center justify-between border-b border-app-border bg-white px-4">
           <div className="min-w-0">
             <div className="truncate text-sm font-bold">
@@ -64,7 +64,7 @@ export function AppLayout() {
             </Button>
           </div>
         </header>
-        <div className="min-h-0 flex-1 overflow-auto p-4">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4">
           <Outlet />
         </div>
       </section>

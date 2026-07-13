@@ -173,7 +173,7 @@ export function PosScreen() {
 
   return (
     <div className="grid h-full min-h-0 grid-cols-[200px_minmax(0,1fr)_380px] gap-3">
-      <section className="flex min-h-0 flex-col rounded-lg border border-app-border bg-white">
+      <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-app-border bg-white">
         <div className="border-b border-app-border p-3">
           <div className="text-sm font-extrabold uppercase text-app-subtle">Order Type</div>
           <div className="mt-2 grid gap-2">
@@ -222,7 +222,7 @@ export function PosScreen() {
         </div>
       </section>
 
-      <section className="flex min-h-0 flex-col rounded-lg border border-app-border bg-white">
+      <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-app-border bg-white">
         <div className="border-b border-app-border p-3">
           <div className="flex items-center gap-2">
             <input
@@ -283,8 +283,9 @@ export function PosScreen() {
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-auto p-3">
-          <div className="space-y-2">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-3">
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <div className="h-full space-y-2 overflow-y-auto pr-1">
             {currentOrder?.items.length ? (
               currentOrder.items.map((item) => (
                 <div
@@ -397,10 +398,11 @@ export function PosScreen() {
                 Add products to start the order.
               </div>
             )}
+            </div>
           </div>
 
           {selectedItem && (
-            <div className="mt-3 rounded-md border border-app-border bg-white p-3">
+            <div className="mt-3 shrink-0 rounded-md border border-app-border bg-white p-3">
               <div className="mb-2 text-xs font-extrabold uppercase text-app-subtle">Selected Item</div>
               {selectedItem.availableVariants.length > 0 && (
                 <div className="mb-3">
