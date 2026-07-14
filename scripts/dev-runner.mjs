@@ -9,6 +9,7 @@ const currentPath = process.env.PATH ?? "";
 const env = {
   ...process.env,
   ComSpec: cmdPath,
+  ELECTRON_RUN_AS_NODE: "",
   PATH: currentPath.toLowerCase().includes(system32Path.toLowerCase())
     ? currentPath
     : `${currentPath};${system32Path}`

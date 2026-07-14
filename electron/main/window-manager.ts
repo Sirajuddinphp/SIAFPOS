@@ -15,7 +15,7 @@ export function createMainWindow(): BrowserWindow {
     nodeIntegration: false,
     enableRemoteModule: false,
     webSecurity: true,
-    sandbox: true
+    sandbox: false
   };
 
   mainWindow = new BrowserWindow({
