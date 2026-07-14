@@ -58,7 +58,7 @@ const ipcChannels = {
   billingSettle: "billing:settle",
   billingGetByOrder: "billing:get-by-order",
   billingPrintReceipt: "billing:print-receipt",
-  printersList: "printers:list", printersSave: "printers:save", printersDiagnostics: "printers:diagnostics", printersTest: "printers:test", printersOpenDrawer: "printers:open-drawer", printersListRoutes: "printers:list-routes", printersSaveRoute: "printers:save-route", printJobsList: "print-jobs:list", printJobsProcess: "print-jobs:process", printJobsRetry: "print-jobs:retry", printJobsQueueKot: "print-jobs:queue-kot"
+  printersList: "printers:list", printersSave: "printers:save", printersDiagnostics: "printers:diagnostics", printersTest: "printers:test", printersOpenDrawer: "printers:open-drawer", printersListRoutes: "printers:list-routes", printersSaveRoute: "printers:save-route", printJobsList: "print-jobs:list", printJobsProcess: "print-jobs:process", printJobsRetry: "print-jobs:retry", printJobsQueueKot: "print-jobs:queue-kot", syncGetStatus: "sync:get-status", syncConfigure: "sync:configure", syncProcess: "sync:process", syncRetryFailed: "sync:retry-failed"
 } as const;
 
 export const posApi: PosApi = {
@@ -120,6 +120,7 @@ export const posApi: PosApi = {
   billing: { preview:(input)=>ipcRenderer.invoke(ipcChannels.billingPreview,input), settle:(input)=>ipcRenderer.invoke(ipcChannels.billingSettle,input), getByOrder:(input)=>ipcRenderer.invoke(ipcChannels.billingGetByOrder,input), printReceipt:(input)=>ipcRenderer.invoke(ipcChannels.billingPrintReceipt,input) },
   printers: { list:()=>ipcRenderer.invoke(ipcChannels.printersList), save:(input)=>ipcRenderer.invoke(ipcChannels.printersSave,input), diagnostics:(input)=>ipcRenderer.invoke(ipcChannels.printersDiagnostics,input), test:(input)=>ipcRenderer.invoke(ipcChannels.printersTest,input), openDrawer:(input)=>ipcRenderer.invoke(ipcChannels.printersOpenDrawer,input), listRoutes:()=>ipcRenderer.invoke(ipcChannels.printersListRoutes), saveRoute:(input)=>ipcRenderer.invoke(ipcChannels.printersSaveRoute,input) },
   printJobs: { list:()=>ipcRenderer.invoke(ipcChannels.printJobsList), process:()=>ipcRenderer.invoke(ipcChannels.printJobsProcess), retry:(input)=>ipcRenderer.invoke(ipcChannels.printJobsRetry,input), queueKot:(input)=>ipcRenderer.invoke(ipcChannels.printJobsQueueKot,input) },
+  sync: { getStatus:()=>ipcRenderer.invoke(ipcChannels.syncGetStatus), configure:(input)=>ipcRenderer.invoke(ipcChannels.syncConfigure,input), process:()=>ipcRenderer.invoke(ipcChannels.syncProcess), retryFailed:()=>ipcRenderer.invoke(ipcChannels.syncRetryFailed) },
   kot: {
     preview: (input) => ipcRenderer.invoke(ipcChannels.kotPreview, input),
     create: (input) => ipcRenderer.invoke(ipcChannels.kotCreate, input),

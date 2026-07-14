@@ -35,6 +35,7 @@ export function AppLayout() {
           <SidebarLink to="/shift" label="Shift" />
           <SidebarLink to="/billing" label="Billing" />
           <SidebarLink to="/printers" label="Printers" />
+          <SidebarLink to="/sync" label="Cloud Sync" />
           {["Customers", "Reports", "Settings"].map((item) => (
             <button key={item} disabled className="block w-full rounded-md px-3 py-2 text-left text-sm font-semibold text-app-subtle opacity-70">
               {item} · Next

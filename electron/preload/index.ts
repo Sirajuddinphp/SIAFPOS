@@ -78,7 +78,11 @@ const ipcChannels = {
   kotMarkStarted: "kot:mark-started",
   kotMarkReady: "kot:mark-ready",
   kotMarkCompleted: "kot:mark-completed",
-  kotReprint: "kot:reprint"
+  kotReprint: "kot:reprint",
+  syncGetStatus: "sync:get-status",
+  syncConfigure: "sync:configure",
+  syncProcess: "sync:process",
+  syncRetryFailed: "sync:retry-failed"
 } as const;
 
 const posApi: PosApi = {
@@ -161,6 +165,12 @@ const posApi: PosApi = {
     process: () => ipcRenderer.invoke(ipcChannels.printJobsProcess),
     retry: (input) => ipcRenderer.invoke(ipcChannels.printJobsRetry, input),
     queueKot: (input) => ipcRenderer.invoke(ipcChannels.printJobsQueueKot, input)
+  },
+  sync: {
+    getStatus: () => ipcRenderer.invoke(ipcChannels.syncGetStatus),
+    configure: (input) => ipcRenderer.invoke(ipcChannels.syncConfigure, input),
+    process: () => ipcRenderer.invoke(ipcChannels.syncProcess),
+    retryFailed: () => ipcRenderer.invoke(ipcChannels.syncRetryFailed)
   },
   kot: {
     preview: (input) => ipcRenderer.invoke(ipcChannels.kotPreview, input),

@@ -28,6 +28,7 @@ import type { AppInfo, ConnectivityStatus, DatabaseHealth, DatabaseVersion, Syst
 import type { FloorMap, WaiterSummary } from "../contracts/table-contracts";
 import type { BillDetail, BillPreview, BillOrderRefInput, BillRefInput, CashShift, CloseShiftInput, OpenShiftInput, PrintReceiptResult, SettleBillInput } from "../contracts/billing-contracts";
 import type { PrintJobSummary, PrinterDiagnostics, PrinterProfile, PrinterRefInput, PrinterRoute, QueueKotPrintInput, RetryPrintJobInput, SavePrinterInput, SavePrinterRouteInput } from "../contracts/printer-contracts";
+import type { ConfigureSyncInput, ProcessSyncResult, SyncStatus } from "../contracts/sync-contracts";
 
 export type PosApi = {
   system: {
@@ -109,6 +110,12 @@ export type PosApi = {
     process: () => Promise<IpcResult<{ processed:number; printed:number; failed:number }>>;
     retry: (input: RetryPrintJobInput) => Promise<IpcResult<{ retried:true }>>;
     queueKot: (input: QueueKotPrintInput) => Promise<IpcResult<{ printJobUuid:string }>>;
+  };
+  sync: {
+    getStatus: () => Promise<IpcResult<SyncStatus>>;
+    configure: (input: ConfigureSyncInput) => Promise<IpcResult<SyncStatus>>;
+    process: () => Promise<IpcResult<ProcessSyncResult>>;
+    retryFailed: () => Promise<IpcResult<SyncStatus>>;
   };
   kot: {
     preview: (input: KotOrderRefInput) => Promise<IpcResult<KotPreview>>;

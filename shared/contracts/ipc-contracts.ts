@@ -79,7 +79,11 @@ export const ipcChannels = {
   printJobsList: "print-jobs:list",
   printJobsProcess: "print-jobs:process",
   printJobsRetry: "print-jobs:retry",
-  printJobsQueueKot: "print-jobs:queue-kot"
+  printJobsQueueKot: "print-jobs:queue-kot",
+  syncGetStatus: "sync:get-status",
+  syncConfigure: "sync:configure",
+  syncProcess: "sync:process",
+  syncRetryFailed: "sync:retry-failed"
 } as const;
 
 export type IpcChannel = (typeof ipcChannels)[keyof typeof ipcChannels];

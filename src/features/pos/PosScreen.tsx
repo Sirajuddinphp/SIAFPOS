@@ -190,7 +190,7 @@ export function PosScreen() {
             ))}
           </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-auto p-3">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
           <div className="mb-2 text-sm font-extrabold uppercase text-app-subtle">Categories</div>
           <div className="space-y-2">
             <button
@@ -283,18 +283,27 @@ export function PosScreen() {
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-auto p-3">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
           <div className="space-y-2">
             {currentOrder?.items.length ? (
               currentOrder.items.map((item) => (
-                <button
+                <div
                   key={item.uuid}
+                  role="button"
+                  tabIndex={0}
                   className={`w-full rounded-md border p-3 text-left ${
                     selectedItemUuid === item.uuid ? "border-app-primary bg-[#eef7f5]" : "border-app-border bg-app-bg"
                   }`}
                   onClick={() => {
                     setSelectedItemUuid(item.uuid);
                     setNoteDraft(item.kitchenNote ?? "");
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setSelectedItemUuid(item.uuid);
+                      setNoteDraft(item.kitchenNote ?? "");
+                    }
                   }}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -328,7 +337,7 @@ export function PosScreen() {
                       </Button>
                     </div>
                   </div>
-                </button>
+                </div>
               ))
             ) : (
               <div className="rounded-md border border-dashed border-app-border bg-app-bg p-6 text-center text-sm text-app-subtle">
@@ -375,7 +384,7 @@ export function PosScreen() {
           )}
         </div>
 
-        <div className="border-t border-app-border p-3">
+        <div className="shrink-0 border-t border-app-border bg-white p-3">
           <div className="mb-2 flex gap-2">
             <select
               className="h-10 flex-1 rounded-md border border-app-border px-3 text-sm"

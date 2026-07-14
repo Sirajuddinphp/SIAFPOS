@@ -137,3 +137,14 @@ Hardware ESC/POS dispatch is intentionally deferred; **Queue Receipt** creates a
 The desktop now includes printer profiles, mock/LAN ESC/POS transports, USB/shared-device path output, 58mm/80mm templates, receipt/KOT queues, retry, diagnostics, test printing, and cash-drawer commands.
 
 For development, create a `mock` printer from the Printers screen. LAN thermal printers normally use port `9100`. USB printers must be exposed through a writable operating-system device/shared-printer path. Printing failures remain in the durable queue and do not roll back billing or KOT operations.
+
+
+## Current implementation status
+
+- Phase 1: Electron/React/SQLite foundation
+- Phase 2: POS Core and Delta KOT
+- Phase 3: Billing, payments, and shifts
+- Phase 4: Printer profiles, ESC/POS queue, diagnostics, and routing
+- Phase 5 foundation: Offline sync outbox and Laravel push client
+
+Electron uses `contextIsolation: true`, `nodeIntegration: false`, and `sandbox: false` because the preload bridge imports compiled local modules.

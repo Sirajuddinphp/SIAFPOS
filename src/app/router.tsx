@@ -12,6 +12,7 @@ import { KitchenScreen } from "../features/kitchen/KitchenScreen";
 import { ShiftScreen } from "../features/shifts/ShiftScreen";
 import { BillingScreen } from "../features/billing/BillingScreen";
 import { PrinterScreen } from "../features/printers/PrinterScreen";
+import { SyncScreen } from "../features/sync/SyncScreen";
 import { useAuthStore } from "../stores/auth-store";
 
 function ProtectedRoute() {
@@ -74,6 +75,10 @@ export const router = createHashRouter([
           {
             path: "/printers",
             element: <PrinterScreen />
+          },
+          {
+            path: "/sync",
+            element: <SyncScreen />
           }
         ]
       }

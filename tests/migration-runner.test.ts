@@ -24,7 +24,9 @@ describe("migration runner", () => {
     expect(tables.map((table) => table.name)).toContain("migration_history");
     expect(tables.map((table) => table.name)).toContain("printer_profiles");
     expect(tables.map((table) => table.name)).toContain("printer_routes");
-    expect(db.prepare("SELECT COUNT(*) AS count FROM migration_history").get()).toEqual({ count: 14 });
+    expect(tables.map((table) => table.name)).toContain("sync_outbox");
+    expect(tables.map((table) => table.name)).toContain("sync_state");
+    expect(db.prepare("SELECT COUNT(*) AS count FROM migration_history").get()).toEqual({ count: 16 });
 
     db.close();
   });
