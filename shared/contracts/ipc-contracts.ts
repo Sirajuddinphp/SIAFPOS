@@ -32,6 +32,9 @@ export const ipcChannels = {
   catalogGetProduct: "catalog:get-product",
   customersSearch: "customers:search",
   customersListRecent: "customers:list-recent",
+  customersSave: "customers:save",
+  customersSetActive: "customers:set-active",
+  reportsSales: "reports:sales",
   tablesGetFloorMap: "tables:get-floor-map",
   tablesListWaiters: "tables:list-waiters",
   ordersCreateDraft: "orders:create-draft",
@@ -83,7 +86,20 @@ export const ipcChannels = {
   syncGetStatus: "sync:get-status",
   syncConfigure: "sync:configure",
   syncProcess: "sync:process",
-  syncRetryFailed: "sync:retry-failed"
+  syncRetryFailed: "sync:retry-failed",
+  inventoryDashboard: "inventory:dashboard",
+  inventorySaveItem: "inventory:save-item",
+  inventoryAdjust: "inventory:adjust",
+  inventorySaveSupplier: "inventory:save-supplier",
+  inventorySaveRecipe: "inventory:save-recipe",
+  inventoryCreatePurchase: "inventory:create-purchase",
+  inventoryCancelPurchase: "inventory:cancel-purchase",
+  staffDashboard: "staff:dashboard",
+  staffSaveEmployee: "staff:save-employee",
+  staffSaveRole: "staff:save-role",
+  staffCheckIn: "staff:check-in",
+  staffCheckOut: "staff:check-out",
+  staffSavePayroll: "staff:save-payroll"
 } as const;
 
 export type IpcChannel = (typeof ipcChannels)[keyof typeof ipcChannels];

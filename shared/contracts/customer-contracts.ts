@@ -7,7 +7,13 @@ export type CustomerSummary = {
   isActive: boolean;
 };
 
-export type CustomerSearchInput = {
-  query: string;
-  limit: number;
+export type CustomerSearchInput = { query: string; limit: number };
+export type CustomerRefInput = { customerUuid: string };
+export type SaveCustomerInput = {
+  customerUuid?: string;
+  name: string;
+  phone?: string | null;
+  email?: string | null;
+  addressSummary?: string | null;
+  isActive?: boolean;
 };

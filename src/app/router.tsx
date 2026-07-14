@@ -13,6 +13,11 @@ import { ShiftScreen } from "../features/shifts/ShiftScreen";
 import { BillingScreen } from "../features/billing/BillingScreen";
 import { PrinterScreen } from "../features/printers/PrinterScreen";
 import { SyncScreen } from "../features/sync/SyncScreen";
+import { CustomersScreen } from "../features/customers/CustomersScreen";
+import { ReportsScreen } from "../features/reports/ReportsScreen";
+import { SettingsScreen } from "../features/settings/SettingsScreen";
+import { InventoryScreen } from "../features/inventory/InventoryScreen";
+import { StaffScreen } from "../features/staff/StaffScreen";
 import { useAuthStore } from "../stores/auth-store";
 
 function ProtectedRoute() {
@@ -76,10 +81,12 @@ export const router = createHashRouter([
             path: "/printers",
             element: <PrinterScreen />
           },
-          {
-            path: "/sync",
-            element: <SyncScreen />
-          }
+          { path: "/sync", element: <SyncScreen /> },
+          { path: "/customers", element: <CustomersScreen /> },
+          { path: "/reports", element: <ReportsScreen /> },
+          { path: "/settings", element: <SettingsScreen /> },
+          { path: "/inventory", element: <InventoryScreen /> },
+          { path: "/staff", element: <StaffScreen /> }
         ]
       }
     ]

@@ -12,6 +12,9 @@ import { registerShiftIpc } from "./shift-ipc";
 import { registerBillingIpc } from "./billing-ipc";
 import { registerPrinterIpc } from "./printer-ipc";
 import { registerSyncIpc } from "./sync-ipc";
+import { registerReportIpc } from "./report-ipc";
+import { registerInventoryIpc } from "./inventory-ipc";
+import { registerStaffIpc } from "./staff-ipc";
 
 let registered = false;
 
@@ -33,5 +36,8 @@ export function registerIpc(db: Database.Database): void {
   registerBillingIpc(db);
   registerPrinterIpc(db);
   registerSyncIpc(db);
+  registerReportIpc(db);
+  registerInventoryIpc(db);
+  registerStaffIpc(db);
   registered = true;
 }

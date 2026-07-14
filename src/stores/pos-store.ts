@@ -8,6 +8,7 @@ type PosState = {
   loading: boolean;
   error: string | null;
   ensureOrder: (orderType?: OrderType) => Promise<void>;
+  createNewOrder: (orderType?: OrderType) => Promise<OrderDraft | null>;
   setOrder: (order: OrderDraft | null) => void;
   setSelectedItemUuid: (orderItemUuid: string | null) => void;
   addProduct: (productUuid: string, variantUuid?: string) => Promise<void>;
@@ -50,6 +51,23 @@ export const usePosStore = create<PosState>((set, get) => ({
       return;
     }
     set({ currentOrder: result.data, loading: false, error: null });
+  },
+  createNewOrder: async (orderType = "takeaway") => {
+    const api = getPosApi();
+    if (!api) {
+      set({ loading: false, error: getPreloadUnavailableMessage() });
+      return null;
+    }
+
+    set({ loading: true, error: null });
+    const result = await api.orders.createDraft({ orderType });
+    if (!result.success) {
+      set({ loading: false, error: result.error.message });
+      return null;
+    }
+
+    set({ currentOrder: result.data, selectedItemUuid: null, loading: false, error: null });
+    return result.data;
   },
   setOrder: (order) => set({ currentOrder: order }),
   setSelectedItemUuid: (orderItemUuid) => set({ selectedItemUuid: orderItemUuid }),

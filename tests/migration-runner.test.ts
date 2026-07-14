@@ -26,7 +26,11 @@ describe("migration runner", () => {
     expect(tables.map((table) => table.name)).toContain("printer_routes");
     expect(tables.map((table) => table.name)).toContain("sync_outbox");
     expect(tables.map((table) => table.name)).toContain("sync_state");
-    expect(db.prepare("SELECT COUNT(*) AS count FROM migration_history").get()).toEqual({ count: 16 });
+    expect(tables.map((table) => table.name)).toContain("inventory_items");
+    expect(tables.map((table) => table.name)).toContain("stock_movements");
+    expect(tables.map((table) => table.name)).toContain("employee_profiles");
+    expect(tables.map((table) => table.name)).toContain("attendance_entries");
+    expect(db.prepare("SELECT COUNT(*) AS count FROM migration_history").get()).toEqual({ count: 18 });
 
     db.close();
   });

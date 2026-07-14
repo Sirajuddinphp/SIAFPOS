@@ -85,18 +85,32 @@ function getMigrationFiles(): Array<{ name: string; path: string }> {
 }
 
 function resolveMigrationsDir(): string {
+  const electronAppAvailable =
+    typeof app !== "undefined" &&
+    app !== null &&
+    typeof app.isPackaged === "boolean";
+
   const candidates = [
     path.join(process.cwd(), "electron", "database", "migrations"),
-    app.isPackaged ? path.join(process.resourcesPath, "migrations") : "",
-    path.join(__dirname, "migrations")
-  ].filter(Boolean);
 
-  const found = candidates.find((candidate) => fs.existsSync(candidate));
-  if (!found) {
+    electronAppAvailable &&
+    app.isPackaged &&
+    typeof process.resourcesPath === "string"
+      ? path.join(process.resourcesPath, "migrations")
+      : null,
+
+    path.join(__dirname, "migrations")
+  ].filter((candidate): candidate is string => Boolean(candidate));
+
+  const migrationsDir = candidates.find((candidate) =>
+    fs.existsSync(candidate)
+  );
+
+  if (!migrationsDir) {
     throw new Error("Migration directory not found.");
   }
 
-  return found;
+  return migrationsDir;
 }
 
 function checksum(value: string): string {

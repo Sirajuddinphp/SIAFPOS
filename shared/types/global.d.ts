@@ -1,6 +1,7 @@
 import type { AuthResponse, AuthSession, PasswordLoginInput, PinLoginInput } from "../contracts/auth-contracts";
 import type { CatalogBootstrap, ProductDetail, ProductSearchInput, ProductSearchResult, ProductCategory } from "../contracts/catalog-contracts";
-import type { CustomerSearchInput, CustomerSummary } from "../contracts/customer-contracts";
+import type { CustomerRefInput, CustomerSearchInput, CustomerSummary, SaveCustomerInput } from "../contracts/customer-contracts";
+import type { ReportRangeInput, SalesReport } from "../contracts/report-contracts";
 import type { IpcResult } from "../contracts/ipc-contracts";
 import type { CancelKotInput, KotOrderRefInput, KotPreview, KotRefInput, KotTicketDetail, KotTicketSummary } from "../contracts/kot-contracts";
 import type {
@@ -29,6 +30,8 @@ import type { FloorMap, WaiterSummary } from "../contracts/table-contracts";
 import type { BillDetail, BillPreview, BillOrderRefInput, BillRefInput, CashShift, CloseShiftInput, OpenShiftInput, PrintReceiptResult, SettleBillInput } from "../contracts/billing-contracts";
 import type { PrintJobSummary, PrinterDiagnostics, PrinterProfile, PrinterRefInput, PrinterRoute, QueueKotPrintInput, RetryPrintJobInput, SavePrinterInput, SavePrinterRouteInput } from "../contracts/printer-contracts";
 import type { ConfigureSyncInput, ProcessSyncResult, SyncStatus } from "../contracts/sync-contracts";
+import type { CreatePurchaseInput, InventoryDashboard, InventoryItem, PurchaseSummary, Recipe, SaveInventoryItemInput, SaveRecipeInput, SaveSupplierInput, StockAdjustmentInput, Supplier } from "../contracts/inventory-contracts";
+import type { AttendanceEntry, AttendanceInput, Employee, PayrollEntry, SaveEmployeeInput, SavePayrollInput, SaveRoleInput, StaffDashboard, StaffRole } from "../contracts/staff-contracts";
 
 export type PosApi = {
   system: {
@@ -59,6 +62,8 @@ export type PosApi = {
   customers: {
     search: (input: CustomerSearchInput) => Promise<IpcResult<CustomerSummary[]>>;
     listRecent: () => Promise<IpcResult<CustomerSummary[]>>;
+    save: (input: SaveCustomerInput) => Promise<IpcResult<CustomerSummary>>;
+    setActive: (input: CustomerRefInput & { isActive: boolean }) => Promise<IpcResult<CustomerSummary>>;
   };
   tables: {
     getFloorMap: () => Promise<IpcResult<FloorMap>>;
@@ -116,6 +121,24 @@ export type PosApi = {
     configure: (input: ConfigureSyncInput) => Promise<IpcResult<SyncStatus>>;
     process: () => Promise<IpcResult<ProcessSyncResult>>;
     retryFailed: () => Promise<IpcResult<SyncStatus>>;
+  };
+  reports: { sales: (input: ReportRangeInput) => Promise<IpcResult<SalesReport>>; };
+  inventory: {
+    dashboard: () => Promise<IpcResult<InventoryDashboard>>;
+    saveItem: (input: SaveInventoryItemInput) => Promise<IpcResult<InventoryItem>>;
+    adjust: (input: StockAdjustmentInput) => Promise<IpcResult<InventoryItem>>;
+    saveSupplier: (input: SaveSupplierInput) => Promise<IpcResult<Supplier>>;
+    saveRecipe: (input: SaveRecipeInput) => Promise<IpcResult<Recipe>>;
+    createPurchase: (input: CreatePurchaseInput) => Promise<IpcResult<PurchaseSummary>>;
+    cancelPurchase: (input: { purchaseUuid:string }) => Promise<IpcResult<PurchaseSummary>>;
+  };
+  staff: {
+    dashboard: () => Promise<IpcResult<StaffDashboard>>;
+    saveEmployee: (input: SaveEmployeeInput) => Promise<IpcResult<Employee>>;
+    saveRole: (input: SaveRoleInput) => Promise<IpcResult<StaffRole>>;
+    checkIn: (input: AttendanceInput) => Promise<IpcResult<AttendanceEntry>>;
+    checkOut: (input: AttendanceInput) => Promise<IpcResult<AttendanceEntry>>;
+    savePayroll: (input: SavePayrollInput) => Promise<IpcResult<PayrollEntry>>;
   };
   kot: {
     preview: (input: KotOrderRefInput) => Promise<IpcResult<KotPreview>>;

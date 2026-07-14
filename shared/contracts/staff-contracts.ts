@@ -1,0 +1,10 @@
+export type StaffRole={uuid:string;name:string;description:string|null;isSystem:boolean;permissions:string[]};
+export type Employee={uuid:string;userUuid:string;employeeCode:string;name:string;username:string;systemRole:string;phone:string|null;email:string|null;address:string|null;department:string|null;designation:string|null;joiningDate:string|null;salaryType:"monthly"|"daily";baseSalaryMinor:number;roleUuid:string|null;roleName:string|null;isActive:boolean};
+export type AttendanceEntry={uuid:string;employeeUuid:string;employeeName:string;workDate:string;checkInAt:string;checkOutAt:string|null;breakMinutes:number;status:"present"|"late"|"absent"|"leave";notes:string|null;workedMinutes:number};
+export type PayrollEntry={uuid:string;employeeUuid:string;employeeName:string;period:string;baseMinor:number;overtimeMinor:number;bonusMinor:number;deductionMinor:number;advanceMinor:number;netMinor:number;status:"draft"|"paid";paidAt:string|null;notes:string|null};
+export type AuditLogEntry={uuid:string;userName:string|null;action:string;entityType:string;entityUuid:string|null;metadata:string|null;createdAt:string};
+export type StaffDashboard={employees:Employee[];roles:StaffRole[];attendance:AttendanceEntry[];payroll:PayrollEntry[];auditLogs:AuditLogEntry[];presentToday:number;openAttendance:number};
+export type SaveEmployeeInput={employeeUuid?:string;name:string;username:string;password?:string;pin?:string;systemRole:"admin"|"manager"|"cashier"|"waiter"|"kitchen";employeeCode:string;phone?:string;email?:string;address?:string;department?:string;designation?:string;joiningDate?:string;salaryType:"monthly"|"daily";baseSalaryMinor:number;roleUuid?:string;isActive?:boolean};
+export type SaveRoleInput={roleUuid?:string;name:string;description?:string;permissions:string[]};
+export type AttendanceInput={employeeUuid:string;notes?:string};
+export type SavePayrollInput={employeeUuid:string;period:string;overtimeMinor?:number;bonusMinor?:number;deductionMinor?:number;advanceMinor?:number;notes?:string};

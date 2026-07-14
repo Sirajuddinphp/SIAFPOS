@@ -1,0 +1,12 @@
+export type InventoryItem = { uuid:string; name:string; sku:string|null; unit:string; reorderLevel:number; costPerUnitMinor:number; onHand:number; isLowStock:boolean; isActive:boolean };
+export type SaveInventoryItemInput = { itemUuid?:string; name:string; sku?:string; unit:string; reorderLevel:number; costPerUnitMinor:number; openingQty?:number; isActive?:boolean };
+export type StockAdjustmentInput = { itemUuid:string; qtyDelta:number; type:"wastage"|"adjustment"|"return"; notes?:string };
+export type Supplier = { uuid:string; name:string; phone:string|null; email:string|null; address:string|null; isActive:boolean };
+export type SaveSupplierInput = { supplierUuid?:string; name:string; phone?:string; email?:string; address?:string; isActive?:boolean };
+export type RecipeLine = { inventoryItemUuid:string; itemName:string; unit:string; qty:number };
+export type Recipe = { uuid:string; productUuid:string; productName:string; yieldQty:number; notes:string|null; items:RecipeLine[] };
+export type SaveRecipeInput = { recipeUuid?:string; productUuid:string; yieldQty:number; notes?:string; items:Array<{inventoryItemUuid:string;qty:number}> };
+export type PurchaseLineInput = { inventoryItemUuid:string; qty:number; unitCostMinor:number };
+export type CreatePurchaseInput = { supplierUuid?:string; invoiceNo?:string; notes?:string; purchasedAt:string; items:PurchaseLineInput[] };
+export type PurchaseSummary = { uuid:string; purchaseNo:string; supplierName:string|null; invoiceNo:string|null; status:"draft"|"posted"|"cancelled"; totalMinor:number; purchasedAt:string };
+export type InventoryDashboard = { items:InventoryItem[]; lowStockCount:number; stockValueMinor:number; suppliers:Supplier[]; purchases:PurchaseSummary[]; recipes:Recipe[] };

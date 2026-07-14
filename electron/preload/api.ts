@@ -21,6 +21,9 @@ const ipcChannels = {
   catalogGetProduct: "catalog:get-product",
   customersSearch: "customers:search",
   customersListRecent: "customers:list-recent",
+  customersSave: "customers:save",
+  customersSetActive: "customers:set-active",
+  reportsSales: "reports:sales",
   tablesGetFloorMap: "tables:get-floor-map",
   tablesListWaiters: "tables:list-waiters",
   ordersCreateDraft: "orders:create-draft",
@@ -58,7 +61,7 @@ const ipcChannels = {
   billingSettle: "billing:settle",
   billingGetByOrder: "billing:get-by-order",
   billingPrintReceipt: "billing:print-receipt",
-  printersList: "printers:list", printersSave: "printers:save", printersDiagnostics: "printers:diagnostics", printersTest: "printers:test", printersOpenDrawer: "printers:open-drawer", printersListRoutes: "printers:list-routes", printersSaveRoute: "printers:save-route", printJobsList: "print-jobs:list", printJobsProcess: "print-jobs:process", printJobsRetry: "print-jobs:retry", printJobsQueueKot: "print-jobs:queue-kot", syncGetStatus: "sync:get-status", syncConfigure: "sync:configure", syncProcess: "sync:process", syncRetryFailed: "sync:retry-failed"
+  printersList: "printers:list", printersSave: "printers:save", printersDiagnostics: "printers:diagnostics", printersTest: "printers:test", printersOpenDrawer: "printers:open-drawer", printersListRoutes: "printers:list-routes", printersSaveRoute: "printers:save-route", printJobsList: "print-jobs:list", printJobsProcess: "print-jobs:process", printJobsRetry: "print-jobs:retry", printJobsQueueKot: "print-jobs:queue-kot", syncGetStatus: "sync:get-status", syncConfigure: "sync:configure", syncProcess: "sync:process", syncRetryFailed: "sync:retry-failed", inventoryDashboard:"inventory:dashboard", inventorySaveItem:"inventory:save-item", inventoryAdjust:"inventory:adjust", inventorySaveSupplier:"inventory:save-supplier", inventorySaveRecipe:"inventory:save-recipe", inventoryCreatePurchase:"inventory:create-purchase", inventoryCancelPurchase:"inventory:cancel-purchase", staffDashboard:"staff:dashboard", staffSaveEmployee:"staff:save-employee", staffSaveRole:"staff:save-role", staffCheckIn:"staff:check-in", staffCheckOut:"staff:check-out", staffSavePayroll:"staff:save-payroll"
 } as const;
 
 export const posApi: PosApi = {
@@ -89,7 +92,9 @@ export const posApi: PosApi = {
   },
   customers: {
     search: (input) => ipcRenderer.invoke(ipcChannels.customersSearch, input),
-    listRecent: () => ipcRenderer.invoke(ipcChannels.customersListRecent)
+    listRecent: () => ipcRenderer.invoke(ipcChannels.customersListRecent),
+    save: (input) => ipcRenderer.invoke(ipcChannels.customersSave, input),
+    setActive: (input) => ipcRenderer.invoke(ipcChannels.customersSetActive, input)
   },
   tables: {
     getFloorMap: () => ipcRenderer.invoke(ipcChannels.tablesGetFloorMap),
@@ -121,6 +126,9 @@ export const posApi: PosApi = {
   printers: { list:()=>ipcRenderer.invoke(ipcChannels.printersList), save:(input)=>ipcRenderer.invoke(ipcChannels.printersSave,input), diagnostics:(input)=>ipcRenderer.invoke(ipcChannels.printersDiagnostics,input), test:(input)=>ipcRenderer.invoke(ipcChannels.printersTest,input), openDrawer:(input)=>ipcRenderer.invoke(ipcChannels.printersOpenDrawer,input), listRoutes:()=>ipcRenderer.invoke(ipcChannels.printersListRoutes), saveRoute:(input)=>ipcRenderer.invoke(ipcChannels.printersSaveRoute,input) },
   printJobs: { list:()=>ipcRenderer.invoke(ipcChannels.printJobsList), process:()=>ipcRenderer.invoke(ipcChannels.printJobsProcess), retry:(input)=>ipcRenderer.invoke(ipcChannels.printJobsRetry,input), queueKot:(input)=>ipcRenderer.invoke(ipcChannels.printJobsQueueKot,input) },
   sync: { getStatus:()=>ipcRenderer.invoke(ipcChannels.syncGetStatus), configure:(input)=>ipcRenderer.invoke(ipcChannels.syncConfigure,input), process:()=>ipcRenderer.invoke(ipcChannels.syncProcess), retryFailed:()=>ipcRenderer.invoke(ipcChannels.syncRetryFailed) },
+  reports: { sales:(input)=>ipcRenderer.invoke(ipcChannels.reportsSales,input) },
+  inventory: { dashboard:()=>ipcRenderer.invoke(ipcChannels.inventoryDashboard), saveItem:(input)=>ipcRenderer.invoke(ipcChannels.inventorySaveItem,input), adjust:(input)=>ipcRenderer.invoke(ipcChannels.inventoryAdjust,input), saveSupplier:(input)=>ipcRenderer.invoke(ipcChannels.inventorySaveSupplier,input), saveRecipe:(input)=>ipcRenderer.invoke(ipcChannels.inventorySaveRecipe,input), createPurchase:(input)=>ipcRenderer.invoke(ipcChannels.inventoryCreatePurchase,input), cancelPurchase:(input)=>ipcRenderer.invoke(ipcChannels.inventoryCancelPurchase,input) },
+  staff: { dashboard:()=>ipcRenderer.invoke(ipcChannels.staffDashboard), saveEmployee:(input)=>ipcRenderer.invoke(ipcChannels.staffSaveEmployee,input), saveRole:(input)=>ipcRenderer.invoke(ipcChannels.staffSaveRole,input), checkIn:(input)=>ipcRenderer.invoke(ipcChannels.staffCheckIn,input), checkOut:(input)=>ipcRenderer.invoke(ipcChannels.staffCheckOut,input), savePayroll:(input)=>ipcRenderer.invoke(ipcChannels.staffSavePayroll,input) },
   kot: {
     preview: (input) => ipcRenderer.invoke(ipcChannels.kotPreview, input),
     create: (input) => ipcRenderer.invoke(ipcChannels.kotCreate, input),

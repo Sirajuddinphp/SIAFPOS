@@ -1,0 +1,5 @@
+import {describe,expect,it,vi} from "vitest";
+import {createMigratedTestDatabase,seedAuthFixture} from "./test-helpers";
+import {StaffRepository} from "../electron/repositories/staff-repository";
+vi.mock("electron",()=>({app:{isPackaged:false,getPath:()=>process.cwd(),getVersion:()=>"0.1.0"}}));
+describe("phase 8 staff",()=>{it("creates employee, attendance and payroll",()=>{const db=createMigratedTestDatabase();const seed=seedAuthFixture(db);const repo=new StaffRepository(db);const now=new Date().toISOString();const employee=repo.saveEmployee({name:"Test Waiter",username:"waiter2",password:"secret12",pin:"2222",systemRole:"waiter",employeeCode:"EMP-002",salaryType:"monthly",baseSalaryMinor:2500000},{restaurantUuid:seed.restaurant.uuid,outletUuid:seed.outlet.uuid},now);expect(employee.name).toBe("Test Waiter");repo.checkIn(employee.uuid,seed.user.uuid,undefined,now);expect(repo.dashboard().openAttendance).toBe(1);repo.checkOut(employee.uuid,new Date(Date.now()+3600000).toISOString());const payroll=repo.savePayroll({employeeUuid:employee.uuid,period:"2026-07",bonusMinor:10000},now);expect(payroll.netMinor).toBe(2510000);db.close();});});

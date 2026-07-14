@@ -39,6 +39,7 @@ export function PosScreen() {
     currentOrder,
     selectedItemUuid,
     ensureOrder,
+    createNewOrder,
     addProduct,
     updateQuantity,
     removeItem,
@@ -269,7 +270,7 @@ export function PosScreen() {
               <div className="text-lg font-extrabold">Current Order</div>
               <div className="text-xs text-app-subtle">{currentOrder?.orderNo ?? "Draft"}</div>
             </div>
-            <Button variant="secondary" className="h-10 px-3" onClick={() => void ensureOrder(selectedOrderType)}>
+            <Button variant="secondary" className="h-10 px-3" onClick={() => void createNewOrder(selectedOrderType)}>
               New Draft
             </Button>
           </div>

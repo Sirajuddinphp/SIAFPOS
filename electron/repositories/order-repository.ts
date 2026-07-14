@@ -221,6 +221,7 @@ export class OrderRepository {
          WHERE o.status IN ('draft', 'active')
            AND NOT EXISTS (SELECT 1 FROM bills b WHERE b.order_uuid = o.uuid AND b.status = 'settled')
          GROUP BY o.uuid
+         HAVING COALESCE(SUM(oi.qty), 0) > 0 OR o.table_uuid IS NOT NULL
          ORDER BY o.updated_at DESC`
       )
       .all() as Array<{

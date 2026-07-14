@@ -7,6 +7,7 @@ export type DiningTableSummary = {
   capacity: number;
   status: DiningTableStatus;
   sortOrder: number;
+  activeOrderUuid: string | null;
 };
 
 export type WaiterSummary = {
