@@ -12,7 +12,6 @@ vi.mock("electron", () => ({
 describe("migration runner", () => {
   it("applies numbered migrations and creates required tables", () => {
     const db = createMigratedTestDatabase();
-
     const tables = db
       .prepare("SELECT name FROM sqlite_master WHERE type = 'table'")
       .all() as Array<{ name: string }>;
@@ -23,14 +22,9 @@ describe("migration runner", () => {
     expect(tables.map((table) => table.name)).toContain("orders");
     expect(tables.map((table) => table.name)).toContain("kot_tickets");
     expect(tables.map((table) => table.name)).toContain("migration_history");
-
-    expect(
-      db
-        .prepare(
-          "SELECT COUNT(*) AS count FROM migration_history"
-        )
-        .get()
-    ).toEqual({ count: 13 });
+    expect(tables.map((table) => table.name)).toContain("printer_profiles");
+    expect(tables.map((table) => table.name)).toContain("printer_routes");
+    expect(db.prepare("SELECT COUNT(*) AS count FROM migration_history").get()).toEqual({ count: 14 });
 
     db.close();
   });

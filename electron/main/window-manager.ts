@@ -15,7 +15,7 @@ export function createMainWindow(): BrowserWindow {
     nodeIntegration: false,
     enableRemoteModule: false,
     webSecurity: true,
-    sandbox: false
+    sandbox: true
   };
 
   mainWindow = new BrowserWindow({
@@ -57,6 +57,7 @@ async function loadRenderer(window: BrowserWindow): Promise<void> {
   if (devServerUrl) {
     logger.info("application", "Loading renderer from Vite dev server", { devServerUrl });
     await window.loadURL(devServerUrl);
+    window.webContents.openDevTools({ mode: "detach" });
     return;
   }
 

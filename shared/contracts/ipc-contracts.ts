@@ -68,7 +68,18 @@ export const ipcChannels = {
   billingPreview: "billing:preview",
   billingSettle: "billing:settle",
   billingGetByOrder: "billing:get-by-order",
-  billingPrintReceipt: "billing:print-receipt"
+  billingPrintReceipt: "billing:print-receipt",
+  printersList: "printers:list",
+  printersSave: "printers:save",
+  printersDiagnostics: "printers:diagnostics",
+  printersTest: "printers:test",
+  printersOpenDrawer: "printers:open-drawer",
+  printersListRoutes: "printers:list-routes",
+  printersSaveRoute: "printers:save-route",
+  printJobsList: "print-jobs:list",
+  printJobsProcess: "print-jobs:process",
+  printJobsRetry: "print-jobs:retry",
+  printJobsQueueKot: "print-jobs:queue-kot"
 } as const;
 
 export type IpcChannel = (typeof ipcChannels)[keyof typeof ipcChannels];

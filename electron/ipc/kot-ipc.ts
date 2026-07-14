@@ -7,10 +7,12 @@ import { logger } from "../logger/logger";
 import { validateIpcInput } from "../security/ipc-validation";
 import { sessionStore } from "../security/session-store";
 import { KotError, KotService } from "../services/kot-service";
+import { PrinterService } from "../services/printer-service";
 import { fail, ok, toSafeError } from "./ipc-result";
 
 export function registerKotIpc(db: Database.Database): void {
   const service = new KotService(db);
+  const printers = new PrinterService(db);
 
   const withSession = <T>(work: (session: NonNullable<ReturnType<typeof sessionStore.getSession>>) => T) => {
     const session = sessionStore.getSession();
@@ -29,7 +31,7 @@ export function registerKotIpc(db: Database.Database): void {
     withSession(() => ok(service.preview(validateIpcInput(kotOrderRefSchema, input).orderUuid)))
   );
   ipcMain.handle(ipcChannels.kotCreate, (_event, input: unknown) =>
-    withSession((session) => ok(service.create(validateIpcInput(kotOrderRefSchema, input).orderUuid, session.user.uuid)))
+    withSession((session) => { const ticket = service.create(validateIpcInput(kotOrderRefSchema, input).orderUuid, session.user.uuid); try { printers.queueKot(ticket.uuid, session.user.uuid); } catch {} return ok(ticket); })
   );
   ipcMain.handle(ipcChannels.kotGet, (_event, input: unknown) =>
     withSession(() => ok(service.get(validateIpcInput(kotRefSchema, input).kotUuid)))
@@ -40,7 +42,7 @@ export function registerKotIpc(db: Database.Database): void {
   ipcMain.handle(ipcChannels.kotCancel, (_event, input: unknown) =>
     withSession((session) => {
       const payload = validateIpcInput(cancelKotSchema, input);
-      return ok(service.cancel(payload.kotUuid, session.user.uuid, payload.reason));
+      const ticket = service.cancel(payload.kotUuid, session.user.uuid, payload.reason); try { printers.queueKot(ticket.uuid, session.user.uuid); } catch {} return ok(ticket);
     })
   );
   ipcMain.handle(ipcChannels.kotMarkStarted, (_event, input: unknown) =>
@@ -53,7 +55,7 @@ export function registerKotIpc(db: Database.Database): void {
     withSession((session) => ok(service.markCompleted(validateIpcInput(kotRefSchema, input).kotUuid, session.user.uuid)))
   );
   ipcMain.handle(ipcChannels.kotReprint, (_event, input: unknown) =>
-    withSession((session) => ok(service.reprint(validateIpcInput(kotRefSchema, input).kotUuid, session.user.uuid)))
+    withSession((session) => { const ticket = service.reprint(validateIpcInput(kotRefSchema, input).kotUuid, session.user.uuid); try { printers.queueKot(ticket.uuid, session.user.uuid); } catch {} return ok(ticket); })
   );
 }
 

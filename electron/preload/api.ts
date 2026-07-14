@@ -54,11 +54,11 @@ const ipcChannels = {
   shiftGetOpen: "shift:get-open",
   shiftOpen: "shift:open",
   shiftClose: "shift:close",
-
   billingPreview: "billing:preview",
   billingSettle: "billing:settle",
   billingGetByOrder: "billing:get-by-order",
-  billingPrintReceipt: "billing:print-receipt"
+  billingPrintReceipt: "billing:print-receipt",
+  printersList: "printers:list", printersSave: "printers:save", printersDiagnostics: "printers:diagnostics", printersTest: "printers:test", printersOpenDrawer: "printers:open-drawer", printersListRoutes: "printers:list-routes", printersSaveRoute: "printers:save-route", printJobsList: "print-jobs:list", printJobsProcess: "print-jobs:process", printJobsRetry: "print-jobs:retry", printJobsQueueKot: "print-jobs:queue-kot"
 } as const;
 
 export const posApi: PosApi = {
@@ -116,20 +116,10 @@ export const posApi: PosApi = {
     listRunning: () => ipcRenderer.invoke(ipcChannels.ordersListRunning),
     getSummary: (input) => ipcRenderer.invoke(ipcChannels.ordersGetSummary, input)
   },
-  shift: {
-    getOpen: () => ipcRenderer.invoke(ipcChannels.shiftGetOpen),
-    open: (input) => ipcRenderer.invoke(ipcChannels.shiftOpen, input),
-    close: (input) => ipcRenderer.invoke(ipcChannels.shiftClose, input)
-  },
-
-  billing: {
-    preview: (input) => ipcRenderer.invoke(ipcChannels.billingPreview, input),
-    settle: (input) => ipcRenderer.invoke(ipcChannels.billingSettle, input),
-    getByOrder: (input) =>
-      ipcRenderer.invoke(ipcChannels.billingGetByOrder, input),
-    printReceipt: (input) =>
-      ipcRenderer.invoke(ipcChannels.billingPrintReceipt, input)
-  },
+  shift: { getOpen:()=>ipcRenderer.invoke(ipcChannels.shiftGetOpen), open:(input)=>ipcRenderer.invoke(ipcChannels.shiftOpen,input), close:(input)=>ipcRenderer.invoke(ipcChannels.shiftClose,input) },
+  billing: { preview:(input)=>ipcRenderer.invoke(ipcChannels.billingPreview,input), settle:(input)=>ipcRenderer.invoke(ipcChannels.billingSettle,input), getByOrder:(input)=>ipcRenderer.invoke(ipcChannels.billingGetByOrder,input), printReceipt:(input)=>ipcRenderer.invoke(ipcChannels.billingPrintReceipt,input) },
+  printers: { list:()=>ipcRenderer.invoke(ipcChannels.printersList), save:(input)=>ipcRenderer.invoke(ipcChannels.printersSave,input), diagnostics:(input)=>ipcRenderer.invoke(ipcChannels.printersDiagnostics,input), test:(input)=>ipcRenderer.invoke(ipcChannels.printersTest,input), openDrawer:(input)=>ipcRenderer.invoke(ipcChannels.printersOpenDrawer,input), listRoutes:()=>ipcRenderer.invoke(ipcChannels.printersListRoutes), saveRoute:(input)=>ipcRenderer.invoke(ipcChannels.printersSaveRoute,input) },
+  printJobs: { list:()=>ipcRenderer.invoke(ipcChannels.printJobsList), process:()=>ipcRenderer.invoke(ipcChannels.printJobsProcess), retry:(input)=>ipcRenderer.invoke(ipcChannels.printJobsRetry,input), queueKot:(input)=>ipcRenderer.invoke(ipcChannels.printJobsQueueKot,input) },
   kot: {
     preview: (input) => ipcRenderer.invoke(ipcChannels.kotPreview, input),
     create: (input) => ipcRenderer.invoke(ipcChannels.kotCreate, input),

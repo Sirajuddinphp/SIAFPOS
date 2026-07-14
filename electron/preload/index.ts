@@ -68,6 +68,21 @@ const posApi: PosApi = {
     getByOrder: (input) => ipcRenderer.invoke(ipcChannels.billingGetByOrder, input),
     printReceipt: (input) => ipcRenderer.invoke(ipcChannels.billingPrintReceipt, input)
   },
+  printers: {
+    list: () => ipcRenderer.invoke(ipcChannels.printersList),
+    save: (input) => ipcRenderer.invoke(ipcChannels.printersSave, input),
+    diagnostics: (input) => ipcRenderer.invoke(ipcChannels.printersDiagnostics, input),
+    test: (input) => ipcRenderer.invoke(ipcChannels.printersTest, input),
+    openDrawer: (input) => ipcRenderer.invoke(ipcChannels.printersOpenDrawer, input),
+    listRoutes: () => ipcRenderer.invoke(ipcChannels.printersListRoutes),
+    saveRoute: (input) => ipcRenderer.invoke(ipcChannels.printersSaveRoute, input)
+  },
+  printJobs: {
+    list: () => ipcRenderer.invoke(ipcChannels.printJobsList),
+    process: () => ipcRenderer.invoke(ipcChannels.printJobsProcess),
+    retry: (input) => ipcRenderer.invoke(ipcChannels.printJobsRetry, input),
+    queueKot: (input) => ipcRenderer.invoke(ipcChannels.printJobsQueueKot, input)
+  },
   kot: {
     preview: (input) => ipcRenderer.invoke(ipcChannels.kotPreview, input),
     create: (input) => ipcRenderer.invoke(ipcChannels.kotCreate, input),

@@ -173,7 +173,7 @@ export function PosScreen() {
 
   return (
     <div className="grid h-full min-h-0 grid-cols-[200px_minmax(0,1fr)_380px] gap-3">
-      <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-app-border bg-white">
+      <section className="flex min-h-0 flex-col rounded-lg border border-app-border bg-white">
         <div className="border-b border-app-border p-3">
           <div className="text-sm font-extrabold uppercase text-app-subtle">Order Type</div>
           <div className="mt-2 grid gap-2">
@@ -222,7 +222,7 @@ export function PosScreen() {
         </div>
       </section>
 
-      <section className="flex min-h-0 flex-col overflow-hidden rounded-lg border border-app-border bg-white">
+      <section className="flex min-h-0 flex-col rounded-lg border border-app-border bg-white">
         <div className="border-b border-app-border p-3">
           <div className="flex items-center gap-2">
             <input
@@ -283,30 +283,18 @@ export function PosScreen() {
           </div>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-3">
-          <div className="min-h-0 flex-1 overflow-hidden">
-            <div className="h-full space-y-2 overflow-y-auto pr-1">
+        <div className="min-h-0 flex-1 overflow-auto p-3">
+          <div className="space-y-2">
             {currentOrder?.items.length ? (
               currentOrder.items.map((item) => (
-                <div
+                <button
                   key={item.uuid}
-                  role="button"
-                  tabIndex={0}
                   className={`w-full rounded-md border p-3 text-left ${
-                    selectedItemUuid === item.uuid
-                      ? "border-app-primary bg-[#eef7f5]"
-                      : "border-app-border bg-app-bg"
+                    selectedItemUuid === item.uuid ? "border-app-primary bg-[#eef7f5]" : "border-app-border bg-app-bg"
                   }`}
                   onClick={() => {
                     setSelectedItemUuid(item.uuid);
                     setNoteDraft(item.kitchenNote ?? "");
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      setSelectedItemUuid(item.uuid);
-                      setNoteDraft(item.kitchenNote ?? "");
-                    }
                   }}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -315,94 +303,42 @@ export function PosScreen() {
                         {item.productName}
                         {item.variantName ? ` • ${item.variantName}` : ""}
                       </div>
-
                       <div className="mt-1 text-xs text-app-subtle">
-                        {item.modifiers.map((modifier) => modifier.name).join(", ") ||
-                          "No add-ons"}
+                        {item.modifiers.map((modifier) => modifier.name).join(", ") || "No add-ons"}
                       </div>
-
-                      {item.kitchenNote && (
-                        <div className="mt-1 text-xs text-app-info">
-                          Note: {item.kitchenNote}
-                        </div>
-                      )}
+                      {item.kitchenNote && <div className="mt-1 text-xs text-app-info">Note: {item.kitchenNote}</div>}
                     </div>
-
                     <div className="text-right">
-                      <div className="text-sm font-bold">
-                        {formatCurrency(item.lineGrandTotalMinor)}
-                      </div>
-                      <div className="text-xs text-app-subtle">
-                        GST {item.gstMode}
-                      </div>
+                      <div className="text-sm font-bold">{formatCurrency(item.lineGrandTotalMinor)}</div>
+                      <div className="text-xs text-app-subtle">GST {item.gstMode}</div>
                     </div>
                   </div>
-
                   <div className="mt-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="secondary"
-                        className="h-9 px-3"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          void updateQuantity(item.uuid, item.qty - 1);
-                        }}
-                      >
-                        -
-                      </Button>
-
-                      <span className="min-w-8 text-center text-sm font-bold">
-                        {item.qty}
-                      </span>
-
-                      <Button
-                        variant="secondary"
-                        className="h-9 px-3"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          void updateQuantity(item.uuid, item.qty + 1);
-                        }}
-                      >
-                        +
-                      </Button>
+                      <Button variant="secondary" className="h-9 px-3" onClick={(event) => { event.stopPropagation(); void updateQuantity(item.uuid, item.qty - 1); }}>-</Button>
+                      <span className="min-w-8 text-center text-sm font-bold">{item.qty}</span>
+                      <Button variant="secondary" className="h-9 px-3" onClick={(event) => { event.stopPropagation(); void updateQuantity(item.uuid, item.qty + 1); }}>+</Button>
                     </div>
-
                     <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        className="h-9 px-3"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          setEditingModifiersFor(item);
-                        }}
-                      >
+                      <Button variant="ghost" className="h-9 px-3" onClick={(event) => { event.stopPropagation(); setEditingModifiersFor(item); }}>
                         Configure
                       </Button>
-
-                      <Button
-                        variant="danger"
-                        className="h-9 px-3"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          void removeItem(item.uuid);
-                        }}
-                      >
+                      <Button variant="danger" className="h-9 px-3" onClick={(event) => { event.stopPropagation(); void removeItem(item.uuid); }}>
                         Remove
                       </Button>
                     </div>
                   </div>
-                </div>
+                </button>
               ))
             ) : (
               <div className="rounded-md border border-dashed border-app-border bg-app-bg p-6 text-center text-sm text-app-subtle">
                 Add products to start the order.
               </div>
             )}
-            </div>
           </div>
 
           {selectedItem && (
-            <div className="mt-3 shrink-0 rounded-md border border-app-border bg-white p-3">
+            <div className="mt-3 rounded-md border border-app-border bg-white p-3">
               <div className="mb-2 text-xs font-extrabold uppercase text-app-subtle">Selected Item</div>
               {selectedItem.availableVariants.length > 0 && (
                 <div className="mb-3">

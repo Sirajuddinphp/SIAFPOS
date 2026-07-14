@@ -27,6 +27,7 @@ import type { SettingsGetInput, SettingsSetInput, SettingRecord } from "../contr
 import type { AppInfo, ConnectivityStatus, DatabaseHealth, DatabaseVersion, SystemHealth } from "../contracts/system-contracts";
 import type { FloorMap, WaiterSummary } from "../contracts/table-contracts";
 import type { BillDetail, BillPreview, BillOrderRefInput, BillRefInput, CashShift, CloseShiftInput, OpenShiftInput, PrintReceiptResult, SettleBillInput } from "../contracts/billing-contracts";
+import type { PrintJobSummary, PrinterDiagnostics, PrinterProfile, PrinterRefInput, PrinterRoute, QueueKotPrintInput, RetryPrintJobInput, SavePrinterInput, SavePrinterRouteInput } from "../contracts/printer-contracts";
 
 export type PosApi = {
   system: {
@@ -93,6 +94,21 @@ export type PosApi = {
     settle: (input: SettleBillInput) => Promise<IpcResult<BillDetail>>;
     getByOrder: (input: BillOrderRefInput) => Promise<IpcResult<BillDetail>>;
     printReceipt: (input: BillRefInput) => Promise<IpcResult<PrintReceiptResult>>;
+  };
+  printers: {
+    list: () => Promise<IpcResult<PrinterProfile[]>>;
+    save: (input: SavePrinterInput) => Promise<IpcResult<PrinterProfile>>;
+    diagnostics: (input: PrinterRefInput) => Promise<IpcResult<PrinterDiagnostics>>;
+    test: (input: PrinterRefInput) => Promise<IpcResult<{ printJobUuid: string }>>;
+    openDrawer: (input: PrinterRefInput) => Promise<IpcResult<{ printJobUuid: string }>>;
+    listRoutes: () => Promise<IpcResult<PrinterRoute[]>>;
+    saveRoute: (input: SavePrinterRouteInput) => Promise<IpcResult<PrinterRoute>>;
+  };
+  printJobs: {
+    list: () => Promise<IpcResult<PrintJobSummary[]>>;
+    process: () => Promise<IpcResult<{ processed:number; printed:number; failed:number }>>;
+    retry: (input: RetryPrintJobInput) => Promise<IpcResult<{ retried:true }>>;
+    queueKot: (input: QueueKotPrintInput) => Promise<IpcResult<{ printJobUuid:string }>>;
   };
   kot: {
     preview: (input: KotOrderRefInput) => Promise<IpcResult<KotPreview>>;
