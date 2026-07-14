@@ -1,0 +1,15 @@
+import type Database from "better-sqlite3";
+import type { PaymentInput } from "../../shared/contracts/billing-contracts";
+import { BillingRepository } from "../repositories/billing-repository";
+import { OrderService } from "./order-service";
+import { ShiftRepository } from "../repositories/shift-repository";
+export class BillingError extends Error { constructor(public readonly code:string,message:string){super(message);} }
+export class BillingService {
+  private readonly bills:BillingRepository; private readonly orders:OrderService; private readonly shifts:ShiftRepository;
+  constructor(private readonly db:Database.Database){this.bills=new BillingRepository(db);this.orders=new OrderService(db);this.shifts=new ShiftRepository(db);}
+  preview(orderUuid:string){ const existing=this.bills.getByOrder(orderUuid); if(existing) return existing; const order=this.orders.getDraft(orderUuid); if(!order.items.length) throw new BillingError("EMPTY_ORDER","Add at least one item before billing."); return { orderUuid:order.uuid,orderNo:order.orderNo,status:"preview" as const,...order.totals,paidMinor:0,balanceMinor:order.totals.grandTotalMinor,payments:[] }; }
+  settle(orderUuid:string,payments:PaymentInput[],ctx:{userUuid:string;terminalUuid:string}){ const tx=this.db.transaction(()=>{ const shift=this.shifts.getOpen(ctx.terminalUuid); if(!shift) throw new BillingError("NO_OPEN_SHIFT","Open a cashier shift before payment."); const order=this.orders.getDraft(orderUuid); if(!order.items.length) throw new BillingError("EMPTY_ORDER","Cannot settle an empty order."); const existing=this.bills.getByOrder(orderUuid); if(existing?.status==='settled') throw new BillingError("ALREADY_SETTLED","This order is already settled."); const paid=payments.reduce((s,p)=>s+p.amountMinor,0); if(paid!==order.totals.grandTotalMinor) throw new BillingError("PAYMENT_MISMATCH","Payment total must equal bill total."); for(const p of payments){ if(p.mode==='cash' && p.receivedMinor!==undefined && p.receivedMinor<p.amountMinor) throw new BillingError("INSUFFICIENT_CASH","Received cash is below cash payment amount."); }
+      const now=new Date().toISOString(); const bill=existing??this.bills.create({orderUuid,shiftUuid:shift.uuid,userUuid:ctx.userUuid,...order.totals,now}); this.bills.addPayments(bill.uuid,payments,ctx.userUuid,now); this.bills.settle(bill.uuid,paid,now); return this.bills.get(bill.uuid)!; }); return tx(); }
+  getByOrder(orderUuid:string){ const bill=this.bills.getByOrder(orderUuid); if(!bill) throw new BillingError("NOT_FOUND","Bill not found."); return bill; }
+  queueReceipt(billUuid:string,userUuid:string){ const bill=this.bills.get(billUuid); if(!bill||bill.status!=='settled') throw new BillingError("INVALID_STATE","Only settled bills can be printed."); const count=(this.db.prepare("SELECT COUNT(*) AS total FROM print_jobs WHERE document_type='receipt' AND document_uuid=?").get(billUuid) as {total:number}).total; const copyType=count===0?'original':'duplicate'; const printJobUuid=this.bills.createPrintJob(billUuid,userUuid,copyType,bill,new Date().toISOString()); return {printJobUuid,billUuid,copyType,status:'pending' as const}; }
+}

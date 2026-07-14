@@ -1,0 +1,22 @@
+import { ipcMain } from "electron";
+import type Database from "better-sqlite3";
+import { ZodError } from "zod";
+import { ipcChannels } from "../../shared/contracts/ipc-contracts";
+import { printJobRefSchema, printerRefSchema, queueKotPrintSchema, savePrinterRouteSchema, savePrinterSchema } from "../../shared/schemas/printer-schemas";
+import { validateIpcInput } from "../security/ipc-validation";
+import { sessionStore } from "../security/session-store";
+import { PrinterError,PrinterService } from "../services/printer-service";
+import { fail,ok,toSafeError } from "./ipc-result";
+export function registerPrinterIpc(db:Database.Database){const service=new PrinterService(db);const run=async<T>(fn:(s:NonNullable<ReturnType<typeof sessionStore.getSession>>)=>T|Promise<T>)=>{const s=sessionStore.getSession();if(!s)return fail("UNAUTHENTICATED","Please log in to continue.");try{return ok(await fn(s));}catch(e){if(e instanceof ZodError)return fail("INVALID_IPC_PAYLOAD","Printer request is invalid.");if(e instanceof PrinterError)return fail(e.code,e.message);const x=toSafeError(e);return fail(x.code,x.message,x.details);}};
+ ipcMain.handle(ipcChannels.printersList,()=>run(()=>service.listPrinters()));
+ ipcMain.handle(ipcChannels.printersSave,(_e,i)=>run(()=>service.savePrinter(validateIpcInput(savePrinterSchema,i))));
+ ipcMain.handle(ipcChannels.printersDiagnostics,(_e,i)=>run(()=>service.diagnostics(validateIpcInput(printerRefSchema,i).printerUuid)));
+ ipcMain.handle(ipcChannels.printersTest,(_e,i)=>run(s=>service.queueTest(validateIpcInput(printerRefSchema,i).printerUuid,s.user.uuid)));
+ ipcMain.handle(ipcChannels.printersOpenDrawer,(_e,i)=>run(s=>service.queueDrawer(validateIpcInput(printerRefSchema,i).printerUuid,s.user.uuid)));
+ ipcMain.handle(ipcChannels.printersListRoutes,()=>run(()=>service.listRoutes()));
+ ipcMain.handle(ipcChannels.printersSaveRoute,(_e,i)=>run(()=>service.saveRoute(validateIpcInput(savePrinterRouteSchema,i))));
+ ipcMain.handle(ipcChannels.printJobsList,()=>run(()=>service.listJobs()));
+ ipcMain.handle(ipcChannels.printJobsProcess,()=>run(()=>service.processQueue()));
+ ipcMain.handle(ipcChannels.printJobsRetry,(_e,i)=>run(()=>service.retry(validateIpcInput(printJobRefSchema,i).printJobUuid)));
+ ipcMain.handle(ipcChannels.printJobsQueueKot,(_e,i)=>run(s=>{const p=validateIpcInput(queueKotPrintSchema,i);return service.queueKot(p.kotUuid,s.user.uuid,p.printerUuid);}));
+}
