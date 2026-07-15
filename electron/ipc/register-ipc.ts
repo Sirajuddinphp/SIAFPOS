@@ -15,6 +15,8 @@ import { registerSyncIpc } from "./sync-ipc";
 import { registerReportIpc } from "./report-ipc";
 import { registerInventoryIpc } from "./inventory-ipc";
 import { registerStaffIpc } from "./staff-ipc";
+import { registerCrmIpc } from "./crm-ipc";
+import { registerOnlineIpc } from "./online-ipc";
 import { registerMenuManagementIpc } from "./menu-management-ipc";
 import { registerMultiOutletIpc } from "./multi-outlet-ipc";
 
@@ -41,7 +43,10 @@ export function registerIpc(db: Database.Database): void {
   registerReportIpc(db);
   registerInventoryIpc(db);
   registerStaffIpc(db);
+  registerCrmIpc(db);
+  registerOnlineIpc(db);
   registerMenuManagementIpc(db);
   registerMultiOutletIpc(db);
+
   registered = true;
 }
