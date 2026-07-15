@@ -31,7 +31,29 @@ import type { BillDetail, BillPreview, BillOrderRefInput, BillRefInput, CashShif
 import type { PrintJobSummary, PrinterDiagnostics, PrinterProfile, PrinterRefInput, PrinterRoute, QueueKotPrintInput, RetryPrintJobInput, SavePrinterInput, SavePrinterRouteInput } from "../contracts/printer-contracts";
 import type { ConfigureSyncInput, ProcessSyncResult, SyncStatus } from "../contracts/sync-contracts";
 import type { CreatePurchaseInput, InventoryDashboard, InventoryItem, PurchaseSummary, Recipe, SaveInventoryItemInput, SaveRecipeInput, SaveSupplierInput, StockAdjustmentInput, Supplier } from "../contracts/inventory-contracts";
+import type { AssignModifierGroupInput, MenuDashboard, MenuProductAdmin, SaveMenuCategoryInput, SaveMenuProductInput, SaveModifierGroupInput, SaveModifierInput, SaveProductVariantInput } from "../contracts/menu-management-contracts";
+import type { CreateStockTransferInput, MultiOutletDashboard, OutletAdmin, SaveOutletInput } from "../contracts/multi-outlet-contracts";
 import type { AttendanceEntry, AttendanceInput, Employee, PayrollEntry, SaveEmployeeInput, SavePayrollInput, SaveRoleInput, StaffDashboard, StaffRole } from "../contracts/staff-contracts";
+import type {
+  AdjustLoyaltyInput,
+  Coupon,
+  CrmDashboard,
+  LoyaltyAccount,
+  Membership,
+  SaveCouponInput,
+  SaveMembershipInput
+} from "../contracts/crm-contracts";
+
+import type {
+  CreateOnlineOrderInput,
+  GenerateQrTokenInput,
+  OnlineChannel,
+  OnlineDashboard,
+  OnlineOrder,
+  QrTableToken,
+  SaveOnlineChannelInput,
+  UpdateOnlineOrderStatusInput
+} from "../contracts/online-contracts";
 
 export type PosApi = {
   system: {
@@ -139,6 +161,51 @@ export type PosApi = {
     checkIn: (input: AttendanceInput) => Promise<IpcResult<AttendanceEntry>>;
     checkOut: (input: AttendanceInput) => Promise<IpcResult<AttendanceEntry>>;
     savePayroll: (input: SavePayrollInput) => Promise<IpcResult<PayrollEntry>>;
+  };
+  crm: {
+    dashboard: () => Promise<IpcResult<CrmDashboard>>;
+    adjust: (
+      input: AdjustLoyaltyInput
+    ) => Promise<IpcResult<LoyaltyAccount>>;
+    saveCoupon: (
+      input: SaveCouponInput
+    ) => Promise<IpcResult<Coupon>>;
+    saveMembership: (
+      input: SaveMembershipInput
+    ) => Promise<IpcResult<Membership>>;
+  };
+
+  online: {
+    dashboard: () => Promise<IpcResult<OnlineDashboard>>;
+    saveChannel: (
+      input: SaveOnlineChannelInput
+    ) => Promise<IpcResult<OnlineChannel>>;
+    generateQr: (
+      input: GenerateQrTokenInput
+    ) => Promise<IpcResult<QrTableToken>>;
+    createOrder: (
+      input: CreateOnlineOrderInput
+    ) => Promise<IpcResult<OnlineOrder>>;
+    updateStatus: (
+      input: UpdateOnlineOrderStatusInput
+    ) => Promise<IpcResult<OnlineOrder>>;
+  };
+  menu: {
+    dashboard: () => Promise<IpcResult<MenuDashboard>>;
+    saveCategory: (input: SaveMenuCategoryInput) => Promise<IpcResult<unknown>>;
+    saveProduct: (input: SaveMenuProductInput) => Promise<IpcResult<MenuProductAdmin>>;
+    saveVariant: (input: SaveProductVariantInput) => Promise<IpcResult<unknown>>;
+    saveModifierGroup: (input: SaveModifierGroupInput) => Promise<IpcResult<unknown>>;
+    saveModifier: (input: SaveModifierInput) => Promise<IpcResult<unknown>>;
+    assignModifierGroup: (input: AssignModifierGroupInput) => Promise<IpcResult<boolean>>;
+  };
+  outlets: {
+    dashboard: () => Promise<IpcResult<MultiOutletDashboard>>;
+    save: (input: SaveOutletInput) => Promise<IpcResult<OutletAdmin>>;
+    createTransfer: (input: CreateStockTransferInput) => Promise<IpcResult<string>>;
+    sendTransfer: (input: { transferUuid: string }) => Promise<IpcResult<boolean>>;
+    receiveTransfer: (input: { transferUuid: string }) => Promise<IpcResult<boolean>>;
+    seedBalance: () => Promise<IpcResult<number>>;
   };
   kot: {
     preview: (input: KotOrderRefInput) => Promise<IpcResult<KotPreview>>;

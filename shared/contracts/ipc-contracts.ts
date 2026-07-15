@@ -99,7 +99,20 @@ export const ipcChannels = {
   staffSaveRole: "staff:save-role",
   staffCheckIn: "staff:check-in",
   staffCheckOut: "staff:check-out",
-  staffSavePayroll: "staff:save-payroll"
+  staffSavePayroll: "staff:save-payroll",
+  menuDashboard: "menu:dashboard",
+  menuSaveCategory: "menu:save-category",
+  menuSaveProduct: "menu:save-product",
+  menuSaveVariant: "menu:save-variant",
+  menuSaveModifierGroup: "menu:save-modifier-group",
+  menuSaveModifier: "menu:save-modifier",
+  menuAssignModifierGroup: "menu:assign-modifier-group",
+  outletsDashboard: "outlets:dashboard",
+  outletsSave: "outlets:save",
+  outletsCreateTransfer: "outlets:create-transfer",
+  outletsSendTransfer: "outlets:send-transfer",
+  outletsReceiveTransfer: "outlets:receive-transfer",
+  outletsSeedBalance: "outlets:seed-balance"
 } as const;
 
 export type IpcChannel = (typeof ipcChannels)[keyof typeof ipcChannels];

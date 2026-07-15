@@ -1,6 +1,12 @@
 import { randomUUID } from "node:crypto";
 import type Database from "better-sqlite3";
-import type { KotItem, KotStatus, KotTicketDetail, KotTicketKind, KotTicketSummary } from "../../shared/contracts/kot-contracts";
+import type {
+  KotItem,
+  KotStatus,
+  KotTicketDetail,
+  KotTicketKind,
+  KotTicketSummary
+} from "../../shared/contracts/kot-contracts";
 import type { OrderType } from "../../shared/contracts/order-contracts";
 
 type KotTicketRow = {
@@ -10,6 +16,11 @@ type KotTicketRow = {
   order_type: OrderType;
   status: KotStatus;
   kind: KotTicketKind;
+  priority: number;
+  station_code: string | null;
+  started_at: string | null;
+  ready_at: string | null;
+  completed_at: string | null;
   reference_kot_uuid: string | null;
   created_at: string;
   updated_at: string;
@@ -56,7 +67,10 @@ export class KotRepository {
   constructor(private readonly db: Database.Database) {}
 
   nextKotNo(): string {
-    const row = this.db.prepare("SELECT COUNT(*) AS count FROM kot_tickets").get() as { count: number };
+    const row = this.db
+      .prepare("SELECT COUNT(*) AS count FROM kot_tickets")
+      .get() as { count: number };
+
     return `KOT-${String(row.count + 1).padStart(5, "0")}`;
   }
 
@@ -71,21 +85,38 @@ export class KotRepository {
     createdAt: string;
     updatedAt: string;
     items: PersistKotItemInput[];
+    priority?: number;
+    stationCode?: string | null;
   }): string {
     const uuid = randomUUID();
+
     this.db
-      .prepare(
-        `INSERT INTO kot_tickets (
-          uuid, order_uuid, kot_no, status, kind, reference_kot_uuid, created_by_user_uuid,
-          printed_at, cancelled_at, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-      )
+      .prepare(`
+        INSERT INTO kot_tickets (
+          uuid,
+          order_uuid,
+          kot_no,
+          status,
+          kind,
+          priority,
+          station_code,
+          reference_kot_uuid,
+          created_by_user_uuid,
+          printed_at,
+          cancelled_at,
+          created_at,
+          updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
       .run(
         uuid,
         input.orderUuid,
         this.nextKotNo(),
         input.status,
         input.kind,
+        input.priority ?? 0,
+        input.stationCode ?? "MAIN",
         input.referenceKotUuid,
         input.createdByUserUuid,
         input.printedAt,
@@ -94,12 +125,22 @@ export class KotRepository {
         input.updatedAt
       );
 
-    const insertItem = this.db.prepare(
-      `INSERT INTO kot_items (
-        uuid, kot_ticket_uuid, order_item_uuid, product_uuid, item_name_snapshot, variant_name_snapshot,
-        qty, line_action, kitchen_note_snapshot, modifier_snapshot_json, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    );
+    const insertItem = this.db.prepare(`
+      INSERT INTO kot_items (
+        uuid,
+        kot_ticket_uuid,
+        order_item_uuid,
+        product_uuid,
+        item_name_snapshot,
+        variant_name_snapshot,
+        qty,
+        line_action,
+        kitchen_note_snapshot,
+        modifier_snapshot_json,
+        created_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
 
     for (const item of input.items) {
       insertItem.run(
@@ -129,70 +170,191 @@ export class KotRepository {
     createdAt: string;
   }): void {
     this.db
-      .prepare(
-        `INSERT INTO kot_status_history (
-          uuid, kot_ticket_uuid, from_status, to_status, changed_by_user_uuid, reason, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)`
-      )
-      .run(randomUUID(), input.kotTicketUuid, input.fromStatus, input.toStatus, input.changedByUserUuid, input.reason, input.createdAt);
+      .prepare(`
+        INSERT INTO kot_status_history (
+          uuid,
+          kot_ticket_uuid,
+          from_status,
+          to_status,
+          changed_by_user_uuid,
+          reason,
+          created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `)
+      .run(
+        randomUUID(),
+        input.kotTicketUuid,
+        input.fromStatus,
+        input.toStatus,
+        input.changedByUserUuid,
+        input.reason,
+        input.createdAt
+      );
   }
 
-  updateTicketState(kotUuid: string, status: KotStatus, updatedAt: string, cancelledAt: string | null = null): void {
-    this.db
-      .prepare("UPDATE kot_tickets SET status = ?, updated_at = ?, cancelled_at = COALESCE(?, cancelled_at) WHERE uuid = ?")
-      .run(status, updatedAt, cancelledAt, kotUuid);
+  updateTicketState(
+    kotUuid: string,
+    status: KotStatus,
+    updatedAt: string,
+    cancelledAt: string | null = null
+  ): void {
+    const timestamps = this.getStatusTimestampColumns(status);
+
+    const result = this.db
+      .prepare(`
+        UPDATE kot_tickets
+        SET status = ?,
+            updated_at = ?,
+            cancelled_at = COALESCE(?, cancelled_at),
+            started_at = COALESCE(?, started_at),
+            ready_at = COALESCE(?, ready_at),
+            completed_at = COALESCE(?, completed_at)
+        WHERE uuid = ?
+      `)
+      .run(
+        status,
+        updatedAt,
+        cancelledAt,
+        timestamps.startedAt,
+        timestamps.readyAt,
+        timestamps.completedAt,
+        kotUuid
+      );
+
+    if (result.changes === 0) {
+      throw new Error("KOT_NOT_FOUND");
+    }
+  }
+
+  updatePriority(kotUuid: string, priority: number): void {
+    const result = this.db
+      .prepare(`
+        UPDATE kot_tickets
+        SET priority = ?,
+            updated_at = ?
+        WHERE uuid = ?
+      `)
+      .run(priority, new Date().toISOString(), kotUuid);
+
+    if (result.changes === 0) {
+      throw new Error("KOT_NOT_FOUND");
+    }
+  }
+
+  updateStation(kotUuid: string, stationCode: string | null): void {
+    const result = this.db
+      .prepare(`
+        UPDATE kot_tickets
+        SET station_code = ?,
+            updated_at = ?
+        WHERE uuid = ?
+      `)
+      .run(stationCode, new Date().toISOString(), kotUuid);
+
+    if (result.changes === 0) {
+      throw new Error("KOT_NOT_FOUND");
+    }
   }
 
   getSummary(kotUuid: string): KotTicketSummary | null {
     const row = this.db
-      .prepare(
-        `SELECT kt.uuid, kt.order_uuid, o.order_no, o.order_type, kt.status, kt.kind, kt.reference_kot_uuid,
-                kt.created_at, kt.updated_at, kt.printed_at, kt.cancelled_at,
-                t.name AS table_name, w.name AS waiter_name, c.name AS customer_name,
-                COUNT(ki.uuid) AS item_count
-         FROM kot_tickets kt
-         INNER JOIN orders o ON o.uuid = kt.order_uuid
-         LEFT JOIN tables t ON t.uuid = o.table_uuid
-         LEFT JOIN waiters w ON w.uuid = o.waiter_uuid
-         LEFT JOIN customers c ON c.uuid = o.customer_uuid
-         LEFT JOIN kot_items ki ON ki.kot_ticket_uuid = kt.uuid
-         WHERE kt.uuid = ?
-         GROUP BY kt.uuid`
-      )
+      .prepare(`
+        SELECT
+          kt.uuid,
+          kt.order_uuid,
+          o.order_no,
+          o.order_type,
+          kt.status,
+          kt.kind,
+          kt.priority,
+          kt.station_code,
+          kt.started_at,
+          kt.ready_at,
+          kt.completed_at,
+          kt.reference_kot_uuid,
+          kt.created_at,
+          kt.updated_at,
+          kt.printed_at,
+          kt.cancelled_at,
+          t.name AS table_name,
+          w.name AS waiter_name,
+          c.name AS customer_name,
+          COUNT(ki.uuid) AS item_count
+        FROM kot_tickets kt
+        INNER JOIN orders o ON o.uuid = kt.order_uuid
+        LEFT JOIN tables t ON t.uuid = o.table_uuid
+        LEFT JOIN waiters w ON w.uuid = o.waiter_uuid
+        LEFT JOIN customers c ON c.uuid = o.customer_uuid
+        LEFT JOIN kot_items ki ON ki.kot_ticket_uuid = kt.uuid
+        WHERE kt.uuid = ?
+        GROUP BY kt.uuid
+      `)
       .get(kotUuid) as KotTicketRow | undefined;
 
-    if (!row) {
-      return null;
-    }
-
-    return mapSummary(row);
+    return row ? mapSummary(row) : null;
   }
 
   getDetail(kotUuid: string): KotTicketDetail | null {
     const row = this.db
-      .prepare(
-        `SELECT kt.uuid, kt.order_uuid, o.order_no, o.order_type, kt.status, kt.kind, kt.reference_kot_uuid,
-                kt.created_at, kt.updated_at, kt.printed_at, kt.cancelled_at,
-                t.name AS table_name, w.name AS waiter_name, c.name AS customer_name,
-                COUNT(ki.uuid) AS item_count
-         FROM kot_tickets kt
-         INNER JOIN orders o ON o.uuid = kt.order_uuid
-         LEFT JOIN tables t ON t.uuid = o.table_uuid
-         LEFT JOIN waiters w ON w.uuid = o.waiter_uuid
-         LEFT JOIN customers c ON c.uuid = o.customer_uuid
-         LEFT JOIN kot_items ki ON ki.kot_ticket_uuid = kt.uuid
-         WHERE kt.uuid = ?
-         GROUP BY kt.uuid`
-      )
+      .prepare(`
+        SELECT
+          kt.uuid,
+          kt.order_uuid,
+          o.order_no,
+          o.order_type,
+          kt.status,
+          kt.kind,
+          kt.priority,
+          kt.station_code,
+          kt.started_at,
+          kt.ready_at,
+          kt.completed_at,
+          kt.reference_kot_uuid,
+          kt.created_at,
+          kt.updated_at,
+          kt.printed_at,
+          kt.cancelled_at,
+          t.name AS table_name,
+          w.name AS waiter_name,
+          c.name AS customer_name,
+          COUNT(ki.uuid) AS item_count
+        FROM kot_tickets kt
+        INNER JOIN orders o ON o.uuid = kt.order_uuid
+        LEFT JOIN tables t ON t.uuid = o.table_uuid
+        LEFT JOIN waiters w ON w.uuid = o.waiter_uuid
+        LEFT JOIN customers c ON c.uuid = o.customer_uuid
+        LEFT JOIN kot_items ki ON ki.kot_ticket_uuid = kt.uuid
+        WHERE kt.uuid = ?
+        GROUP BY kt.uuid
+      `)
       .get(kotUuid) as KotTicketRow | undefined;
 
     if (!row) {
       return null;
     }
 
-    const itemRows = this.db.prepare("SELECT * FROM kot_items WHERE kot_ticket_uuid = ? ORDER BY id").all(kotUuid) as KotItemRow[];
+    const itemRows = this.db
+      .prepare(`
+        SELECT *
+        FROM kot_items
+        WHERE kot_ticket_uuid = ?
+        ORDER BY id
+      `)
+      .all(kotUuid) as KotItemRow[];
+
     const historyRows = this.db
-      .prepare("SELECT uuid, from_status, to_status, reason, created_at FROM kot_status_history WHERE kot_ticket_uuid = ? ORDER BY id")
+      .prepare(`
+        SELECT
+          uuid,
+          from_status,
+          to_status,
+          reason,
+          created_at
+        FROM kot_status_history
+        WHERE kot_ticket_uuid = ?
+        ORDER BY id
+      `)
       .all(kotUuid) as KotHistoryRow[];
 
     return {
@@ -211,28 +373,92 @@ export class KotRepository {
 
   listByOrder(orderUuid: string): KotTicketSummary[] {
     const rows = this.db
-      .prepare(
-        `SELECT kt.uuid, kt.order_uuid, o.order_no, o.order_type, kt.status, kt.kind, kt.reference_kot_uuid,
-                kt.created_at, kt.updated_at, kt.printed_at, kt.cancelled_at,
-                t.name AS table_name, w.name AS waiter_name, c.name AS customer_name,
-                COUNT(ki.uuid) AS item_count
-         FROM kot_tickets kt
-         INNER JOIN orders o ON o.uuid = kt.order_uuid
-         LEFT JOIN tables t ON t.uuid = o.table_uuid
-         LEFT JOIN waiters w ON w.uuid = o.waiter_uuid
-         LEFT JOIN customers c ON c.uuid = o.customer_uuid
-         LEFT JOIN kot_items ki ON ki.kot_ticket_uuid = kt.uuid
-         WHERE kt.order_uuid = ?
-         GROUP BY kt.uuid
-         ORDER BY kt.created_at DESC, kt.id DESC`
-      )
+      .prepare(`
+        SELECT
+          kt.uuid,
+          kt.order_uuid,
+          o.order_no,
+          o.order_type,
+          kt.status,
+          kt.kind,
+          kt.priority,
+          kt.station_code,
+          kt.started_at,
+          kt.ready_at,
+          kt.completed_at,
+          kt.reference_kot_uuid,
+          kt.created_at,
+          kt.updated_at,
+          kt.printed_at,
+          kt.cancelled_at,
+          t.name AS table_name,
+          w.name AS waiter_name,
+          c.name AS customer_name,
+          COUNT(ki.uuid) AS item_count
+        FROM kot_tickets kt
+        INNER JOIN orders o ON o.uuid = kt.order_uuid
+        LEFT JOIN tables t ON t.uuid = o.table_uuid
+        LEFT JOIN waiters w ON w.uuid = o.waiter_uuid
+        LEFT JOIN customers c ON c.uuid = o.customer_uuid
+        LEFT JOIN kot_items ki ON ki.kot_ticket_uuid = kt.uuid
+        WHERE kt.order_uuid = ?
+        GROUP BY kt.uuid
+        ORDER BY kt.created_at DESC, kt.id DESC
+      `)
       .all(orderUuid) as KotTicketRow[];
 
     return rows.map(mapSummary);
   }
 
-  listTicketRowsByOrder(orderUuid: string): Array<KotTicketSummary & { items: KotItem[] }> {
-    return this.listByOrder(orderUuid)
+  listActiveTickets(stationCode?: string | null): KotTicketSummary[] {
+    const rows = this.db
+      .prepare(`
+        SELECT
+          kt.uuid,
+          kt.order_uuid,
+          o.order_no,
+          o.order_type,
+          kt.status,
+          kt.kind,
+          kt.priority,
+          kt.station_code,
+          kt.started_at,
+          kt.ready_at,
+          kt.completed_at,
+          kt.reference_kot_uuid,
+          kt.created_at,
+          kt.updated_at,
+          kt.printed_at,
+          kt.cancelled_at,
+          t.name AS table_name,
+          w.name AS waiter_name,
+          c.name AS customer_name,
+          COUNT(ki.uuid) AS item_count
+        FROM kot_tickets kt
+        INNER JOIN orders o ON o.uuid = kt.order_uuid
+        LEFT JOIN tables t ON t.uuid = o.table_uuid
+        LEFT JOIN waiters w ON w.uuid = o.waiter_uuid
+        LEFT JOIN customers c ON c.uuid = o.customer_uuid
+        LEFT JOIN kot_items ki ON ki.kot_ticket_uuid = kt.uuid
+        WHERE kt.status IN ('new', 'preparing', 'ready')
+          AND kt.kind != 'reprint'
+          AND kt.cancelled_at IS NULL
+          AND (? IS NULL OR kt.station_code = ?)
+        GROUP BY kt.uuid
+        ORDER BY
+          kt.priority DESC,
+          kt.created_at ASC,
+          kt.id ASC
+      `)
+      .all(stationCode ?? null, stationCode ?? null) as KotTicketRow[];
+
+    return rows.map(mapSummary);
+  }
+
+  listTicketRowsByOrder(
+    orderUuid: string
+  ): Array<KotTicketSummary & { items: KotItem[] }> {
+    return [...this.listByOrder(orderUuid)]
       .reverse()
       .map((summary) => ({
         ...summary,
@@ -241,12 +467,34 @@ export class KotRepository {
   }
 
   listItems(kotUuid: string): KotItem[] {
-    const rows = this.db.prepare("SELECT * FROM kot_items WHERE kot_ticket_uuid = ? ORDER BY id").all(kotUuid) as KotItemRow[];
+    const rows = this.db
+      .prepare(`
+        SELECT *
+        FROM kot_items
+        WHERE kot_ticket_uuid = ?
+        ORDER BY id
+      `)
+      .all(kotUuid) as KotItemRow[];
+
     return rows.map(mapItem);
   }
 
-  getOrderContext(orderUuid: string): { orderNo: string; orderType: OrderType } | null {
-    const row = this.db.prepare("SELECT order_no, order_type FROM orders WHERE uuid = ?").get(orderUuid) as { order_no: string; order_type: OrderType } | undefined;
+  getOrderContext(
+    orderUuid: string
+  ): { orderNo: string; orderType: OrderType } | null {
+    const row = this.db
+      .prepare(`
+        SELECT order_no, order_type
+        FROM orders
+        WHERE uuid = ?
+      `)
+      .get(orderUuid) as
+      | {
+          order_no: string;
+          order_type: OrderType;
+        }
+      | undefined;
+
     if (!row) {
       return null;
     }
@@ -254,6 +502,20 @@ export class KotRepository {
     return {
       orderNo: row.order_no,
       orderType: row.order_type
+    };
+  }
+
+  private getStatusTimestampColumns(status: KotStatus): {
+    startedAt: string | null;
+    readyAt: string | null;
+    completedAt: string | null;
+  } {
+    const now = new Date().toISOString();
+
+    return {
+      startedAt: status === "preparing" ? now : null,
+      readyAt: status === "ready" ? now : null,
+      completedAt: status === "completed" ? now : null
     };
   }
 }
@@ -266,6 +528,11 @@ function mapSummary(row: KotTicketRow): KotTicketSummary {
     orderType: row.order_type,
     status: row.status,
     kind: row.kind,
+    priority: row.priority,
+    stationCode: row.station_code,
+    startedAt: row.started_at,
+    readyAt: row.ready_at,
+    completedAt: row.completed_at,
     itemCount: row.item_count,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -278,6 +545,20 @@ function mapSummary(row: KotTicketRow): KotTicketSummary {
 }
 
 function mapItem(row: KotItemRow): KotItem {
+  let modifierNames: string[] = [];
+
+  try {
+    const parsed = JSON.parse(row.modifier_snapshot_json) as unknown;
+
+    if (Array.isArray(parsed)) {
+      modifierNames = parsed.filter(
+        (value): value is string => typeof value === "string"
+      );
+    }
+  } catch {
+    modifierNames = [];
+  }
+
   return {
     uuid: row.uuid,
     orderItemUuid: row.order_item_uuid,
@@ -287,6 +568,6 @@ function mapItem(row: KotItemRow): KotItem {
     qty: row.qty,
     lineAction: row.line_action,
     kitchenNote: row.kitchen_note_snapshot,
-    modifierNames: JSON.parse(row.modifier_snapshot_json) as string[]
+    modifierNames
   };
 }

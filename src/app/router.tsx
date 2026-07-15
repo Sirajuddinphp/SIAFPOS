@@ -18,6 +18,8 @@ import { ReportsScreen } from "../features/reports/ReportsScreen";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { InventoryScreen } from "../features/inventory/InventoryScreen";
 import { StaffScreen } from "../features/staff/StaffScreen";
+import { MenuManagementScreen } from "../features/menu-management/MenuManagementScreen";
+import { OutletsScreen } from "../features/outlets/OutletsScreen";
 import { useAuthStore } from "../stores/auth-store";
 
 function ProtectedRoute() {
@@ -86,7 +88,9 @@ export const router = createHashRouter([
           { path: "/reports", element: <ReportsScreen /> },
           { path: "/settings", element: <SettingsScreen /> },
           { path: "/inventory", element: <InventoryScreen /> },
-          { path: "/staff", element: <StaffScreen /> }
+          { path: "/staff", element: <StaffScreen /> },
+          { path: "/menu-management", element: <MenuManagementScreen /> },
+          { path: "/outlets", element: <OutletsScreen /> }
         ]
       }
     ]

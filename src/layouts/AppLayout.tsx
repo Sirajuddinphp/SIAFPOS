@@ -37,7 +37,9 @@ export function AppLayout() {
           <SidebarLink to="/printers" label="Printers" />
           <SidebarLink to="/sync" label="Cloud Sync" />
           <SidebarLink to="/customers" label="Customers" />
+          <SidebarLink to="/menu-management" label="Menu Management" />
           <SidebarLink to="/inventory" label="Inventory" />
+          <SidebarLink to="/outlets" label="Outlets & Transfers" />
           <SidebarLink to="/staff" label="Staff & HR" />
           <SidebarLink to="/reports" label="Reports" />
           <SidebarLink to="/settings" label="Settings" />

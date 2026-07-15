@@ -1,8 +1,21 @@
 import type { OrderType } from "./order-contracts";
 
-export type KotStatus = "new" | "preparing" | "ready" | "completed";
-export type KotTicketKind = "full" | "delta" | "cancel" | "reprint";
-export type KotItemAction = "add" | "update" | "cancel";
+export type KotStatus =
+  | "new"
+  | "preparing"
+  | "ready"
+  | "completed";
+
+export type KotTicketKind =
+  | "full"
+  | "delta"
+  | "cancel"
+  | "reprint";
+
+export type KotItemAction =
+  | "add"
+  | "update"
+  | "cancel";
 
 export type KotItem = {
   uuid: string;
@@ -23,6 +36,11 @@ export type KotTicketSummary = {
   orderType: OrderType;
   status: KotStatus;
   kind: KotTicketKind;
+  priority: number;
+  stationCode: string | null;
+  startedAt: string | null;
+  readyAt: string | null;
+  completedAt: string | null;
   itemCount: number;
   createdAt: string;
   updatedAt: string;
@@ -33,16 +51,18 @@ export type KotTicketSummary = {
   waiterName: string | null;
 };
 
+export type KotStatusHistory = {
+  uuid: string;
+  fromStatus: KotStatus | null;
+  toStatus: KotStatus;
+  reason: string | null;
+  createdAt: string;
+};
+
 export type KotTicketDetail = KotTicketSummary & {
   customerName: string | null;
   items: KotItem[];
-  history: Array<{
-    uuid: string;
-    fromStatus: KotStatus | null;
-    toStatus: KotStatus;
-    reason: string | null;
-    createdAt: string;
-  }>;
+  history: KotStatusHistory[];
 };
 
 export type KotPreview = {
@@ -51,17 +71,4 @@ export type KotPreview = {
   orderType: OrderType;
   ticketKind: "full" | "delta";
   items: KotItem[];
-};
-
-export type KotOrderRefInput = {
-  orderUuid: string;
-};
-
-export type KotRefInput = {
-  kotUuid: string;
-};
-
-export type CancelKotInput = {
-  kotUuid: string;
-  reason?: string;
 };

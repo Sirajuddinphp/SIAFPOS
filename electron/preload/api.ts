@@ -61,7 +61,16 @@ const ipcChannels = {
   billingSettle: "billing:settle",
   billingGetByOrder: "billing:get-by-order",
   billingPrintReceipt: "billing:print-receipt",
-  printersList: "printers:list", printersSave: "printers:save", printersDiagnostics: "printers:diagnostics", printersTest: "printers:test", printersOpenDrawer: "printers:open-drawer", printersListRoutes: "printers:list-routes", printersSaveRoute: "printers:save-route", printJobsList: "print-jobs:list", printJobsProcess: "print-jobs:process", printJobsRetry: "print-jobs:retry", printJobsQueueKot: "print-jobs:queue-kot", syncGetStatus: "sync:get-status", syncConfigure: "sync:configure", syncProcess: "sync:process", syncRetryFailed: "sync:retry-failed", inventoryDashboard:"inventory:dashboard", inventorySaveItem:"inventory:save-item", inventoryAdjust:"inventory:adjust", inventorySaveSupplier:"inventory:save-supplier", inventorySaveRecipe:"inventory:save-recipe", inventoryCreatePurchase:"inventory:create-purchase", inventoryCancelPurchase:"inventory:cancel-purchase", staffDashboard:"staff:dashboard", staffSaveEmployee:"staff:save-employee", staffSaveRole:"staff:save-role", staffCheckIn:"staff:check-in", staffCheckOut:"staff:check-out", staffSavePayroll:"staff:save-payroll"
+  crmDashboard: "crm:dashboard",
+  crmAdjust: "crm:adjust",
+  crmSaveCoupon: "crm:save-coupon",
+  crmSaveMembership: "crm:save-membership",
+  onlineDashboard: "online:dashboard",
+  onlineSaveChannel: "online:save-channel",
+  onlineGenerateQr: "online:generate-qr",
+  onlineCreateOrder: "online:create-order",
+  onlineUpdateStatus: "online:update-status",
+  printersList: "printers:list", printersSave: "printers:save", printersDiagnostics: "printers:diagnostics", printersTest: "printers:test", printersOpenDrawer: "printers:open-drawer", printersListRoutes: "printers:list-routes", printersSaveRoute: "printers:save-route", printJobsList: "print-jobs:list", printJobsProcess: "print-jobs:process", printJobsRetry: "print-jobs:retry", printJobsQueueKot: "print-jobs:queue-kot", syncGetStatus: "sync:get-status", syncConfigure: "sync:configure", syncProcess: "sync:process", syncRetryFailed: "sync:retry-failed", inventoryDashboard:"inventory:dashboard", inventorySaveItem:"inventory:save-item", inventoryAdjust:"inventory:adjust", inventorySaveSupplier:"inventory:save-supplier", inventorySaveRecipe:"inventory:save-recipe", inventoryCreatePurchase:"inventory:create-purchase", inventoryCancelPurchase:"inventory:cancel-purchase", staffDashboard:"staff:dashboard", staffSaveEmployee:"staff:save-employee", staffSaveRole:"staff:save-role", staffCheckIn:"staff:check-in", staffCheckOut:"staff:check-out", staffSavePayroll:"staff:save-payroll", menuDashboard:"menu:dashboard", menuSaveCategory:"menu:save-category", menuSaveProduct:"menu:save-product", menuSaveVariant:"menu:save-variant", menuSaveModifierGroup:"menu:save-modifier-group", menuSaveModifier:"menu:save-modifier", menuAssignModifierGroup:"menu:assign-modifier-group", outletsDashboard:"outlets:dashboard", outletsSave:"outlets:save", outletsCreateTransfer:"outlets:create-transfer", outletsSendTransfer:"outlets:send-transfer", outletsReceiveTransfer:"outlets:receive-transfer", outletsSeedBalance:"outlets:seed-balance",
 } as const;
 
 export const posApi: PosApi = {
@@ -129,6 +138,38 @@ export const posApi: PosApi = {
   reports: { sales:(input)=>ipcRenderer.invoke(ipcChannels.reportsSales,input) },
   inventory: { dashboard:()=>ipcRenderer.invoke(ipcChannels.inventoryDashboard), saveItem:(input)=>ipcRenderer.invoke(ipcChannels.inventorySaveItem,input), adjust:(input)=>ipcRenderer.invoke(ipcChannels.inventoryAdjust,input), saveSupplier:(input)=>ipcRenderer.invoke(ipcChannels.inventorySaveSupplier,input), saveRecipe:(input)=>ipcRenderer.invoke(ipcChannels.inventorySaveRecipe,input), createPurchase:(input)=>ipcRenderer.invoke(ipcChannels.inventoryCreatePurchase,input), cancelPurchase:(input)=>ipcRenderer.invoke(ipcChannels.inventoryCancelPurchase,input) },
   staff: { dashboard:()=>ipcRenderer.invoke(ipcChannels.staffDashboard), saveEmployee:(input)=>ipcRenderer.invoke(ipcChannels.staffSaveEmployee,input), saveRole:(input)=>ipcRenderer.invoke(ipcChannels.staffSaveRole,input), checkIn:(input)=>ipcRenderer.invoke(ipcChannels.staffCheckIn,input), checkOut:(input)=>ipcRenderer.invoke(ipcChannels.staffCheckOut,input), savePayroll:(input)=>ipcRenderer.invoke(ipcChannels.staffSavePayroll,input) },
+  crm: {
+    dashboard: () =>
+      ipcRenderer.invoke(ipcChannels.crmDashboard),
+
+    adjust: (input) =>
+      ipcRenderer.invoke(ipcChannels.crmAdjust, input),
+
+    saveCoupon: (input) =>
+      ipcRenderer.invoke(ipcChannels.crmSaveCoupon, input),
+
+    saveMembership: (input) =>
+      ipcRenderer.invoke(ipcChannels.crmSaveMembership, input)
+  },
+
+  online: {
+    dashboard: () =>
+      ipcRenderer.invoke(ipcChannels.onlineDashboard),
+
+    saveChannel: (input) =>
+      ipcRenderer.invoke(ipcChannels.onlineSaveChannel, input),
+
+    generateQr: (input) =>
+      ipcRenderer.invoke(ipcChannels.onlineGenerateQr, input),
+
+    createOrder: (input) =>
+      ipcRenderer.invoke(ipcChannels.onlineCreateOrder, input),
+
+    updateStatus: (input) =>
+      ipcRenderer.invoke(ipcChannels.onlineUpdateStatus, input)
+  },
+  menu: { dashboard:()=>ipcRenderer.invoke(ipcChannels.menuDashboard), saveCategory:(input)=>ipcRenderer.invoke(ipcChannels.menuSaveCategory,input), saveProduct:(input)=>ipcRenderer.invoke(ipcChannels.menuSaveProduct,input), saveVariant:(input)=>ipcRenderer.invoke(ipcChannels.menuSaveVariant,input), saveModifierGroup:(input)=>ipcRenderer.invoke(ipcChannels.menuSaveModifierGroup,input), saveModifier:(input)=>ipcRenderer.invoke(ipcChannels.menuSaveModifier,input), assignModifierGroup:(input)=>ipcRenderer.invoke(ipcChannels.menuAssignModifierGroup,input) },
+  outlets: { dashboard:()=>ipcRenderer.invoke(ipcChannels.outletsDashboard), save:(input)=>ipcRenderer.invoke(ipcChannels.outletsSave,input), createTransfer:(input)=>ipcRenderer.invoke(ipcChannels.outletsCreateTransfer,input), sendTransfer:(input)=>ipcRenderer.invoke(ipcChannels.outletsSendTransfer,input), receiveTransfer:(input)=>ipcRenderer.invoke(ipcChannels.outletsReceiveTransfer,input), seedBalance:()=>ipcRenderer.invoke(ipcChannels.outletsSeedBalance) },
   kot: {
     preview: (input) => ipcRenderer.invoke(ipcChannels.kotPreview, input),
     create: (input) => ipcRenderer.invoke(ipcChannels.kotCreate, input),
