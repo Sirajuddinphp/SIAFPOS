@@ -41,6 +41,8 @@ export function AppLayout() {
           <SidebarLink to="/inventory" label="Inventory" />
           <SidebarLink to="/outlets" label="Outlets & Transfers" />
           <SidebarLink to="/staff" label="Staff & HR" />
+          <SidebarLink to="/accounting" label="Accounting" />
+          <SidebarLink to="/enterprise" label="Enterprise & SaaS" />
           <SidebarLink to="/reports" label="Reports" />
           <SidebarLink to="/settings" label="Settings" />
         </nav>

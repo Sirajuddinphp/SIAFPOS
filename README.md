@@ -148,3 +148,7 @@ For development, create a `mock` printer from the Printers screen. LAN thermal p
 - Phase 5 foundation: Offline sync outbox and Laravel push client
 
 Electron uses `contextIsolation: true`, `nodeIntegration: false`, and `sandbox: false` because the preload bridge imports compiled local modules.
+
+## Phase 15 – Enterprise / SaaS Foundation
+
+The Enterprise & SaaS screen adds local license activation, registered-device control, scoped API-key creation/revocation, and auditable SQLite backups. Remote license verification, update feeds, and central fleet management can be connected later through the Laravel cloud control plane.

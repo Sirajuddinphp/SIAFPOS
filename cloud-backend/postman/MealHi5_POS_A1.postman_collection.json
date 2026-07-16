@@ -1,0 +1,43 @@
+{
+  "info": {
+    "name": "MealHi5 POS Cloud - Phase A1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Activate POS",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/activation",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "activation"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"restaurant_code\": \"REST001\",\n  \"license_key\": \"MH5-DEMO-2026-ABCDE\",\n  \"owner_email\": \"owner@example.com\",\n  \"owner_mobile\": \"+919999999999\",\n  \"device\": {\n    \"uuid\": \"11111111-1111-4111-8111-111111111111\",\n    \"machine_fingerprint\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n    \"windows_username\": \"cashier\",\n    \"computer_name\": \"POS-01\",\n    \"app_version\": \"0.1.0\"\n  }\n}"
+        }
+      }
+    }
+  ]
+}

@@ -20,10 +20,16 @@ import { InventoryScreen } from "../features/inventory/InventoryScreen";
 import { StaffScreen } from "../features/staff/StaffScreen";
 import { MenuManagementScreen } from "../features/menu-management/MenuManagementScreen";
 import { OutletsScreen } from "../features/outlets/OutletsScreen";
+import { AccountingScreen } from "../features/accounting/AccountingScreen";
+import { EnterpriseScreen } from "../features/enterprise/EnterpriseScreen";
+import { ActivationScreen } from "../features/activation/ActivationScreen";
+import { useActivationStore } from "../stores/activation-store";
 import { useAuthStore } from "../stores/auth-store";
 
 function ProtectedRoute() {
   const session = useAuthStore((state) => state.session);
+  const activation = useActivationStore((state) => state.state);
+  if (!activation?.activated) return <Navigate to="/activation" replace />;
   return session ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
@@ -32,6 +38,7 @@ export const router = createHashRouter([
     path: "/",
     element: <StartupScreen />
   },
+  { path: "/activation", element: <ActivationScreen /> },
   {
     element: <AuthLayout />,
     children: [
@@ -90,7 +97,9 @@ export const router = createHashRouter([
           { path: "/inventory", element: <InventoryScreen /> },
           { path: "/staff", element: <StaffScreen /> },
           { path: "/menu-management", element: <MenuManagementScreen /> },
-          { path: "/outlets", element: <OutletsScreen /> }
+          { path: "/outlets", element: <OutletsScreen /> },
+          { path: "/accounting", element: <AccountingScreen /> },
+          { path: "/enterprise", element: <EnterpriseScreen /> }
         ]
       }
     ]

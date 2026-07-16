@@ -1,0 +1,4 @@
+import { z } from "zod";
+const uuid=z.string().uuid();
+export const saveFinanceAccountSchema=z.object({uuid:uuid.optional(),name:z.string().trim().min(1).max(100),accountType:z.enum(["cash","bank","expense","income","supplier","customer","tax","equity"]),openingBalanceMinor:z.number().int().optional().default(0),isActive:z.boolean().optional().default(true)});
+export const createFinanceEntrySchema=z.object({entryDate:z.string().datetime(),entryType:z.enum(["expense","income","supplier_payment","customer_receipt","journal"]),accountUuid:uuid,counterAccountUuid:uuid.nullish(),amountMinor:z.number().int().positive(),description:z.string().trim().min(1).max(250),paymentMode:z.string().trim().min(1).max(30).optional().default("cash"),referenceType:z.string().max(40).nullish(),referenceUuid:z.string().max(80).nullish()});

@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { StatusPill } from "../../components/common/StatusPill";
 import { Button } from "../../components/ui/Button";
 import { useAuthStore } from "../../stores/auth-store";
+import { useActivationStore } from "../../stores/activation-store";
 import { useSystemStore } from "../../stores/system-store";
 
 export function StartupScreen() {
   const navigate = useNavigate();
   const restoreSession = useAuthStore((state) => state.restoreSession);
+  const loadActivation = useActivationStore((state) => state.load);
   const { appInfo, health, databaseHealth, refresh, error } = useSystemStore();
   const [startupFailed, setStartupFailed] = useState(false);
 
@@ -16,6 +18,11 @@ export function StartupScreen() {
     async function boot() {
       try {
         await refresh();
+        const activation = await loadActivation();
+        if (!activation.activated) {
+          navigate("/activation", { replace: true });
+          return;
+        }
         await restoreSession();
         if (!mounted) {
           return;
@@ -37,14 +44,14 @@ export function StartupScreen() {
     return () => {
       mounted = false;
     };
-  }, [navigate, refresh, restoreSession]);
+  }, [loadActivation, navigate, refresh, restoreSession]);
 
   return (
     <main className="flex h-screen w-screen items-center justify-center bg-app-bg">
       <section className="w-[560px] rounded-lg border border-app-border bg-white p-6 shadow-sm">
         <div className="mb-5">
           <div className="text-2xl font-extrabold text-app-text">MealHi5 POS</div>
-          <div className="text-sm text-app-subtle">Starting secure offline desktop foundation</div>
+          <div className="text-sm text-app-subtle">Starting secure activated desktop POS</div>
         </div>
 
         <div className="space-y-3">

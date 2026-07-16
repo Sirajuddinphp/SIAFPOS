@@ -7,6 +7,8 @@ const ipcChannels = {
   systemGetAppInfo: "system:get-app-info",
   systemGetHealth: "system:get-health",
   systemGetConnectivity: "system:get-connectivity",
+  activationGetState: "activation:get-state",
+  activationActivate: "activation:activate",
   databaseGetHealth: "database:get-health",
   databaseGetVersion: "database:get-version",
   authLoginPassword: "auth:login-password",
@@ -70,7 +72,7 @@ const ipcChannels = {
   onlineGenerateQr: "online:generate-qr",
   onlineCreateOrder: "online:create-order",
   onlineUpdateStatus: "online:update-status",
-  printersList: "printers:list", printersSave: "printers:save", printersDiagnostics: "printers:diagnostics", printersTest: "printers:test", printersOpenDrawer: "printers:open-drawer", printersListRoutes: "printers:list-routes", printersSaveRoute: "printers:save-route", printJobsList: "print-jobs:list", printJobsProcess: "print-jobs:process", printJobsRetry: "print-jobs:retry", printJobsQueueKot: "print-jobs:queue-kot", syncGetStatus: "sync:get-status", syncConfigure: "sync:configure", syncProcess: "sync:process", syncRetryFailed: "sync:retry-failed", inventoryDashboard:"inventory:dashboard", inventorySaveItem:"inventory:save-item", inventoryAdjust:"inventory:adjust", inventorySaveSupplier:"inventory:save-supplier", inventorySaveRecipe:"inventory:save-recipe", inventoryCreatePurchase:"inventory:create-purchase", inventoryCancelPurchase:"inventory:cancel-purchase", staffDashboard:"staff:dashboard", staffSaveEmployee:"staff:save-employee", staffSaveRole:"staff:save-role", staffCheckIn:"staff:check-in", staffCheckOut:"staff:check-out", staffSavePayroll:"staff:save-payroll", menuDashboard:"menu:dashboard", menuSaveCategory:"menu:save-category", menuSaveProduct:"menu:save-product", menuSaveVariant:"menu:save-variant", menuSaveModifierGroup:"menu:save-modifier-group", menuSaveModifier:"menu:save-modifier", menuAssignModifierGroup:"menu:assign-modifier-group", outletsDashboard:"outlets:dashboard", outletsSave:"outlets:save", outletsCreateTransfer:"outlets:create-transfer", outletsSendTransfer:"outlets:send-transfer", outletsReceiveTransfer:"outlets:receive-transfer", outletsSeedBalance:"outlets:seed-balance",
+  printersList: "printers:list", printersSave: "printers:save", printersDiagnostics: "printers:diagnostics", printersTest: "printers:test", printersOpenDrawer: "printers:open-drawer", printersListRoutes: "printers:list-routes", printersSaveRoute: "printers:save-route", printJobsList: "print-jobs:list", printJobsProcess: "print-jobs:process", printJobsRetry: "print-jobs:retry", printJobsQueueKot: "print-jobs:queue-kot", syncGetStatus: "sync:get-status", syncConfigure: "sync:configure", syncProcess: "sync:process", syncRetryFailed: "sync:retry-failed", inventoryDashboard:"inventory:dashboard", inventorySaveItem:"inventory:save-item", inventoryAdjust:"inventory:adjust", inventorySaveSupplier:"inventory:save-supplier", inventorySaveRecipe:"inventory:save-recipe", inventoryCreatePurchase:"inventory:create-purchase", inventoryCancelPurchase:"inventory:cancel-purchase", staffDashboard:"staff:dashboard", staffSaveEmployee:"staff:save-employee", staffSaveRole:"staff:save-role", staffCheckIn:"staff:check-in", staffCheckOut:"staff:check-out", staffSavePayroll:"staff:save-payroll", menuDashboard:"menu:dashboard", menuSaveCategory:"menu:save-category", menuSaveProduct:"menu:save-product", menuSaveVariant:"menu:save-variant", menuSaveModifierGroup:"menu:save-modifier-group", menuSaveModifier:"menu:save-modifier", menuAssignModifierGroup:"menu:assign-modifier-group", outletsDashboard:"outlets:dashboard", outletsSave:"outlets:save", outletsCreateTransfer:"outlets:create-transfer", outletsSendTransfer:"outlets:send-transfer", outletsReceiveTransfer:"outlets:receive-transfer", outletsSeedBalance:"outlets:seed-balance", accountingDashboard:"accounting:dashboard", accountingSaveAccount:"accounting:save-account", accountingCreateEntry:"accounting:create-entry", enterpriseDashboard:"enterprise:dashboard", enterpriseActivateLicense:"enterprise:activate-license", enterpriseRegisterDevice:"enterprise:register-device", enterpriseRevokeDevice:"enterprise:revoke-device", enterpriseCreateApiKey:"enterprise:create-api-key", enterpriseRevokeApiKey:"enterprise:revoke-api-key", enterpriseCreateBackup:"enterprise:create-backup", enterpriseRequestRestore:"enterprise:request-restore",
 } as const;
 
 export const posApi: PosApi = {
@@ -78,6 +80,10 @@ export const posApi: PosApi = {
     getAppInfo: () => ipcRenderer.invoke(ipcChannels.systemGetAppInfo),
     getHealth: () => ipcRenderer.invoke(ipcChannels.systemGetHealth),
     getConnectivity: () => ipcRenderer.invoke(ipcChannels.systemGetConnectivity)
+  },
+  activation: {
+    getState: () => ipcRenderer.invoke(ipcChannels.activationGetState),
+    activate: (input) => ipcRenderer.invoke(ipcChannels.activationActivate, input)
   },
   database: {
     getHealth: () => ipcRenderer.invoke(ipcChannels.databaseGetHealth),
@@ -170,6 +176,21 @@ export const posApi: PosApi = {
   },
   menu: { dashboard:()=>ipcRenderer.invoke(ipcChannels.menuDashboard), saveCategory:(input)=>ipcRenderer.invoke(ipcChannels.menuSaveCategory,input), saveProduct:(input)=>ipcRenderer.invoke(ipcChannels.menuSaveProduct,input), saveVariant:(input)=>ipcRenderer.invoke(ipcChannels.menuSaveVariant,input), saveModifierGroup:(input)=>ipcRenderer.invoke(ipcChannels.menuSaveModifierGroup,input), saveModifier:(input)=>ipcRenderer.invoke(ipcChannels.menuSaveModifier,input), assignModifierGroup:(input)=>ipcRenderer.invoke(ipcChannels.menuAssignModifierGroup,input) },
   outlets: { dashboard:()=>ipcRenderer.invoke(ipcChannels.outletsDashboard), save:(input)=>ipcRenderer.invoke(ipcChannels.outletsSave,input), createTransfer:(input)=>ipcRenderer.invoke(ipcChannels.outletsCreateTransfer,input), sendTransfer:(input)=>ipcRenderer.invoke(ipcChannels.outletsSendTransfer,input), receiveTransfer:(input)=>ipcRenderer.invoke(ipcChannels.outletsReceiveTransfer,input), seedBalance:()=>ipcRenderer.invoke(ipcChannels.outletsSeedBalance) },
+  accounting: {
+    dashboard: () => ipcRenderer.invoke(ipcChannels.accountingDashboard),
+    saveAccount: (input) => ipcRenderer.invoke(ipcChannels.accountingSaveAccount, input),
+    createEntry: (input) => ipcRenderer.invoke(ipcChannels.accountingCreateEntry, input)
+  },
+  enterprise: {
+    dashboard: () => ipcRenderer.invoke(ipcChannels.enterpriseDashboard),
+    activateLicense: (input) => ipcRenderer.invoke(ipcChannels.enterpriseActivateLicense, input),
+    registerDevice: (input) => ipcRenderer.invoke(ipcChannels.enterpriseRegisterDevice, input),
+    revokeDevice: (input) => ipcRenderer.invoke(ipcChannels.enterpriseRevokeDevice, input),
+    createApiKey: (input) => ipcRenderer.invoke(ipcChannels.enterpriseCreateApiKey, input),
+    revokeApiKey: (input) => ipcRenderer.invoke(ipcChannels.enterpriseRevokeApiKey, input),
+    createBackup: () => ipcRenderer.invoke(ipcChannels.enterpriseCreateBackup),
+    requestRestore: (input) => ipcRenderer.invoke(ipcChannels.enterpriseRequestRestore, input)
+  },
   kot: {
     preview: (input) => ipcRenderer.invoke(ipcChannels.kotPreview, input),
     create: (input) => ipcRenderer.invoke(ipcChannels.kotCreate, input),

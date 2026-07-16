@@ -1,4 +1,5 @@
 import type Database from "better-sqlite3";
+import { registerActivationIpc } from "./activation-ipc";
 import { registerAuthIpc } from "./auth-ipc";
 import { registerCatalogIpc } from "./catalog-ipc";
 import { registerCustomerIpc } from "./customer-ipc";
@@ -19,6 +20,8 @@ import { registerCrmIpc } from "./crm-ipc";
 import { registerOnlineIpc } from "./online-ipc";
 import { registerMenuManagementIpc } from "./menu-management-ipc";
 import { registerMultiOutletIpc } from "./multi-outlet-ipc";
+import { registerAccountingIpc } from "./accounting-ipc";
+import { registerEnterpriseIpc } from "./enterprise-ipc";
 
 let registered = false;
 
@@ -27,6 +30,7 @@ export function registerIpc(db: Database.Database): void {
     return;
   }
 
+  registerActivationIpc();
   registerSystemIpc(db);
   registerDatabaseIpc(db);
   registerAuthIpc(db);
@@ -47,6 +51,8 @@ export function registerIpc(db: Database.Database): void {
   registerOnlineIpc(db);
   registerMenuManagementIpc(db);
   registerMultiOutletIpc(db);
+  registerAccountingIpc(db);
+  registerEnterpriseIpc(db);
 
   registered = true;
 }

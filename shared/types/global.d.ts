@@ -1,3 +1,4 @@
+import type { ActivateDeviceInput, ActivationState } from "../contracts/activation-contracts";
 import type { AuthResponse, AuthSession, PasswordLoginInput, PinLoginInput } from "../contracts/auth-contracts";
 import type { CatalogBootstrap, ProductDetail, ProductSearchInput, ProductSearchResult, ProductCategory } from "../contracts/catalog-contracts";
 import type { CustomerRefInput, CustomerSearchInput, CustomerSummary, SaveCustomerInput } from "../contracts/customer-contracts";
@@ -44,6 +45,9 @@ import type {
   SaveMembershipInput
 } from "../contracts/crm-contracts";
 
+import type { CreateFinanceEntryInput, FinanceAccount, FinanceDashboard, FinanceEntry, SaveFinanceAccountInput } from "../contracts/accounting-contracts";
+import type { ActivateLicenseInput, CreateApiKeyInput, EnterpriseApiKey, EnterpriseBackup, EnterpriseDashboard, EnterpriseDevice, EnterpriseLicense, RegisterDeviceInput } from "../contracts/enterprise-contracts";
+
 import type {
   CreateOnlineOrderInput,
   GenerateQrTokenInput,
@@ -60,6 +64,10 @@ export type PosApi = {
     getAppInfo: () => Promise<IpcResult<AppInfo>>;
     getHealth: () => Promise<IpcResult<SystemHealth>>;
     getConnectivity: () => Promise<IpcResult<ConnectivityStatus>>;
+  };
+  activation: {
+    getState: () => Promise<IpcResult<ActivationState>>;
+    activate: (input: ActivateDeviceInput) => Promise<IpcResult<ActivationState>>;
   };
   database: {
     getHealth: () => Promise<IpcResult<DatabaseHealth>>;
@@ -206,6 +214,21 @@ export type PosApi = {
     sendTransfer: (input: { transferUuid: string }) => Promise<IpcResult<boolean>>;
     receiveTransfer: (input: { transferUuid: string }) => Promise<IpcResult<boolean>>;
     seedBalance: () => Promise<IpcResult<number>>;
+  };
+  accounting: {
+    dashboard: () => Promise<IpcResult<FinanceDashboard>>;
+    saveAccount: (input: SaveFinanceAccountInput) => Promise<IpcResult<FinanceAccount>>;
+    createEntry: (input: CreateFinanceEntryInput) => Promise<IpcResult<FinanceEntry>>;
+  };
+  enterprise: {
+    dashboard: () => Promise<IpcResult<EnterpriseDashboard>>;
+    activateLicense: (input: ActivateLicenseInput) => Promise<IpcResult<EnterpriseLicense>>;
+    registerDevice: (input: RegisterDeviceInput) => Promise<IpcResult<EnterpriseDevice>>;
+    revokeDevice: (input: { uuid: string }) => Promise<IpcResult<EnterpriseDevice>>;
+    createApiKey: (input: CreateApiKeyInput) => Promise<IpcResult<EnterpriseApiKey>>;
+    revokeApiKey: (input: { uuid: string }) => Promise<IpcResult<EnterpriseApiKey>>;
+    createBackup: () => Promise<IpcResult<EnterpriseBackup>>;
+    requestRestore: (input: { uuid: string }) => Promise<IpcResult<EnterpriseBackup>>;
   };
   kot: {
     preview: (input: KotOrderRefInput) => Promise<IpcResult<KotPreview>>;

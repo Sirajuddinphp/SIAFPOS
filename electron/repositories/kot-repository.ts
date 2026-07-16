@@ -17,7 +17,7 @@ type KotTicketRow = {
   status: KotStatus;
   kind: KotTicketKind;
   priority: number;
-  station_code: string | null;
+  kitchen_station: string | null;
   started_at: string | null;
   ready_at: string | null;
   completed_at: string | null;
@@ -99,7 +99,7 @@ export class KotRepository {
           status,
           kind,
           priority,
-          station_code,
+          kitchen_station,
           reference_kot_uuid,
           created_by_user_uuid,
           printed_at,
@@ -246,7 +246,7 @@ export class KotRepository {
     const result = this.db
       .prepare(`
         UPDATE kot_tickets
-        SET station_code = ?,
+        SET kitchen_station = ?,
             updated_at = ?
         WHERE uuid = ?
       `)
@@ -268,7 +268,7 @@ export class KotRepository {
           kt.status,
           kt.kind,
           kt.priority,
-          kt.station_code,
+          kt.kitchen_station,
           kt.started_at,
           kt.ready_at,
           kt.completed_at,
@@ -306,7 +306,7 @@ export class KotRepository {
           kt.status,
           kt.kind,
           kt.priority,
-          kt.station_code,
+          kt.kitchen_station,
           kt.started_at,
           kt.ready_at,
           kt.completed_at,
@@ -382,7 +382,7 @@ export class KotRepository {
           kt.status,
           kt.kind,
           kt.priority,
-          kt.station_code,
+          kt.kitchen_station,
           kt.started_at,
           kt.ready_at,
           kt.completed_at,
@@ -421,7 +421,7 @@ export class KotRepository {
           kt.status,
           kt.kind,
           kt.priority,
-          kt.station_code,
+          kt.kitchen_station,
           kt.started_at,
           kt.ready_at,
           kt.completed_at,
@@ -443,7 +443,7 @@ export class KotRepository {
         WHERE kt.status IN ('new', 'preparing', 'ready')
           AND kt.kind != 'reprint'
           AND kt.cancelled_at IS NULL
-          AND (? IS NULL OR kt.station_code = ?)
+          AND (? IS NULL OR kt.kitchen_station = ?)
         GROUP BY kt.uuid
         ORDER BY
           kt.priority DESC,
@@ -529,7 +529,7 @@ function mapSummary(row: KotTicketRow): KotTicketSummary {
     status: row.status,
     kind: row.kind,
     priority: row.priority,
-    stationCode: row.station_code,
+    stationCode: row.kitchen_station,
     startedAt: row.started_at,
     readyAt: row.ready_at,
     completedAt: row.completed_at,
