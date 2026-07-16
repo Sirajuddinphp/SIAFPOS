@@ -9,6 +9,11 @@ const ipcChannels = {
   systemGetConnectivity: "system:get-connectivity",
   activationGetState: "activation:get-state",
   activationActivate: "activation:activate",
+  runtimeGetStatus: "runtime:get-status",
+  runtimeStartTrial: "runtime:start-trial",
+  runtimeActivateYearly: "runtime:activate-yearly",
+  runtimeVerify: "runtime:verify",
+  runtimeClear: "runtime:clear",
   databaseGetHealth: "database:get-health",
   databaseGetVersion: "database:get-version",
   authLoginPassword: "auth:login-password",
@@ -76,6 +81,13 @@ const ipcChannels = {
 } as const;
 
 export const posApi: PosApi = {
+  runtime: {
+    getStatus: () => ipcRenderer.invoke(ipcChannels.runtimeGetStatus),
+    startTrial: (input) => ipcRenderer.invoke(ipcChannels.runtimeStartTrial, input),
+    activateYearly: (input) => ipcRenderer.invoke(ipcChannels.runtimeActivateYearly, input),
+    verify: () => ipcRenderer.invoke(ipcChannels.runtimeVerify),
+    clear: () => ipcRenderer.invoke(ipcChannels.runtimeClear)
+  },
   system: {
     getAppInfo: () => ipcRenderer.invoke(ipcChannels.systemGetAppInfo),
     getHealth: () => ipcRenderer.invoke(ipcChannels.systemGetHealth),

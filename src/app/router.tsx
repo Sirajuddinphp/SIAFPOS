@@ -23,13 +23,17 @@ import { OutletsScreen } from "../features/outlets/OutletsScreen";
 import { AccountingScreen } from "../features/accounting/AccountingScreen";
 import { EnterpriseScreen } from "../features/enterprise/EnterpriseScreen";
 import { ActivationScreen } from "../features/activation/ActivationScreen";
+import { RuntimeAccessScreen } from "../features/runtime-access/RuntimeAccessScreen";
 import { useActivationStore } from "../stores/activation-store";
+import { useRuntimeAccessStore } from "../stores/runtime-access-store";
 import { useAuthStore } from "../stores/auth-store";
 
 function ProtectedRoute() {
   const session = useAuthStore((state) => state.session);
   const activation = useActivationStore((state) => state.state);
+  const runtime = useRuntimeAccessStore((state) => state.status);
   if (!activation?.activated) return <Navigate to="/activation" replace />;
+  if (!runtime || runtime.requiresActivation) return <Navigate to="/runtime-access" replace />;
   return session ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
@@ -39,6 +43,7 @@ export const router = createHashRouter([
     element: <StartupScreen />
   },
   { path: "/activation", element: <ActivationScreen /> },
+  { path: "/runtime-access", element: <RuntimeAccessScreen /> },
   {
     element: <AuthLayout />,
     children: [

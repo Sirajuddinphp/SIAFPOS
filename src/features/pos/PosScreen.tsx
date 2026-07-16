@@ -173,7 +173,7 @@ export function PosScreen() {
   );
 
   return (
-    <div className="grid h-full min-h-0 grid-cols-[200px_minmax(0,1fr)_380px] gap-3">
+    <div className="grid h-full min-h-0 grid-cols-[200px_minmax(0,1fr)_440px] gap-3">
       <section className="flex min-h-0 flex-col rounded-lg border border-app-border bg-white">
         <div className="border-b border-app-border p-3">
           <div className="text-sm font-extrabold uppercase text-app-subtle">Order Type</div>
@@ -284,7 +284,7 @@ export function PosScreen() {
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
+        <div className="min-h-[320px] flex-1 overflow-y-auto overscroll-contain p-3">
           <div className="space-y-2">
             {currentOrder?.items.length ? (
               currentOrder.items.map((item) => (

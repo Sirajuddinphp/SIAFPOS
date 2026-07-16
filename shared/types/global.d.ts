@@ -28,6 +28,7 @@ import type {
 import type { SettingsGetInput, SettingsSetInput, SettingRecord } from "../contracts/settings-contracts";
 import type { AppInfo, ConnectivityStatus, DatabaseHealth, DatabaseVersion, SystemHealth } from "../contracts/system-contracts";
 import type { FloorMap, WaiterSummary } from "../contracts/table-contracts";
+import type { RuntimeAccessState, RuntimeRegistrationInput, RuntimeStatus } from "../contracts/runtime-access-contracts";
 import type { BillDetail, BillPreview, BillOrderRefInput, BillRefInput, CashShift, CloseShiftInput, OpenShiftInput, PrintReceiptResult, SettleBillInput } from "../contracts/billing-contracts";
 import type { PrintJobSummary, PrinterDiagnostics, PrinterProfile, PrinterRefInput, PrinterRoute, QueueKotPrintInput, RetryPrintJobInput, SavePrinterInput, SavePrinterRouteInput } from "../contracts/printer-contracts";
 import type { ConfigureSyncInput, ProcessSyncResult, SyncStatus } from "../contracts/sync-contracts";
@@ -60,6 +61,13 @@ import type {
 } from "../contracts/online-contracts";
 
 export type PosApi = {
+  runtime: {
+    getStatus: () => Promise<IpcResult<RuntimeStatus>>;
+    startTrial: (input: RuntimeRegistrationInput) => Promise<IpcResult<RuntimeAccessState>>;
+    activateYearly: (input: RuntimeRegistrationInput) => Promise<IpcResult<RuntimeAccessState>>;
+    verify: () => Promise<IpcResult<RuntimeStatus>>;
+    clear: () => Promise<IpcResult<{ cleared: true }>>;
+  };
   system: {
     getAppInfo: () => Promise<IpcResult<AppInfo>>;
     getHealth: () => Promise<IpcResult<SystemHealth>>;

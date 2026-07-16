@@ -1,5 +1,6 @@
 import type Database from "better-sqlite3";
 import { registerActivationIpc } from "./activation-ipc";
+import { registerRuntimeAccessIpc } from "./runtime-access-ipc";
 import { registerAuthIpc } from "./auth-ipc";
 import { registerCatalogIpc } from "./catalog-ipc";
 import { registerCustomerIpc } from "./customer-ipc";
@@ -31,6 +32,7 @@ export function registerIpc(db: Database.Database): void {
   }
 
   registerActivationIpc();
+  registerRuntimeAccessIpc();
   registerSystemIpc(db);
   registerDatabaseIpc(db);
   registerAuthIpc(db);

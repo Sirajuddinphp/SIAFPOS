@@ -14,7 +14,7 @@ export function ActivationScreen() {
   async function submit(event: FormEvent) {
     event.preventDefault();
     const activated = await activate({ restaurantCode, licenseKey, ownerEmail, ownerMobile });
-    if (activated) navigate("/login", { replace: true });
+    if (activated) navigate("/runtime-access", { replace: true });
   }
 
   return (

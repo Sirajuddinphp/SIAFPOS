@@ -5,11 +5,13 @@ import { Button } from "../../components/ui/Button";
 import { useAuthStore } from "../../stores/auth-store";
 import { useActivationStore } from "../../stores/activation-store";
 import { useSystemStore } from "../../stores/system-store";
+import { useRuntimeAccessStore } from "../../stores/runtime-access-store";
 
 export function StartupScreen() {
   const navigate = useNavigate();
   const restoreSession = useAuthStore((state) => state.restoreSession);
   const loadActivation = useActivationStore((state) => state.load);
+  const verifyRuntime = useRuntimeAccessStore((state) => state.verify);
   const { appInfo, health, databaseHealth, refresh, error } = useSystemStore();
   const [startupFailed, setStartupFailed] = useState(false);
 
@@ -21,6 +23,11 @@ export function StartupScreen() {
         const activation = await loadActivation();
         if (!activation.activated) {
           navigate("/activation", { replace: true });
+          return;
+        }
+        const runtime = await verifyRuntime();
+        if (!runtime || runtime.requiresActivation) {
+          navigate("/runtime-access", { replace: true });
           return;
         }
         await restoreSession();
@@ -44,7 +51,7 @@ export function StartupScreen() {
     return () => {
       mounted = false;
     };
-  }, [loadActivation, navigate, refresh, restoreSession]);
+  }, [loadActivation, navigate, refresh, restoreSession, verifyRuntime]);
 
   return (
     <main className="flex h-screen w-screen items-center justify-center bg-app-bg">
